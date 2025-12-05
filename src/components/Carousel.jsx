@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-export default function Carousel({ slides = [], interval = 7000 }) {
+export default function Carousel({ slides = [], interval = 4000}) {
   const [current, setCurrent] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
 

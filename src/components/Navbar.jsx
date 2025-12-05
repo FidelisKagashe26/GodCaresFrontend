@@ -1,4 +1,3 @@
-// src/components/Navbar.jsx
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
@@ -55,11 +54,12 @@ export default function Navbar() {
   };
 
   // --------- GROUPED NAV (ili navbar iwe fupi desktop) ----------
+  // HOME tumeitoa kwenye hii list, ipo standalone juu ya groups
   const navGroups = [
     {
       id: 'journey',
       label: language === 'sw' ? 'Safari ya Imani' : 'Faith Journey',
-      items: [navItems.home, navItems.studies, navItems.events],
+      items: [navItems.studies, navItems.events],
     },
     {
       id: 'resources',
@@ -165,8 +165,25 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* Desktop Navigation (grouped) */}
-          <div className="hidden lg:flex items-center gap-1">
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center gap-2">
+            {/* Home standalone */}
+            <Link
+              to={navItems.home.href}
+              onClick={closeAllDropdowns}
+              className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[12px] font-medium transition-all ${
+                isActive(navItems.home.href)
+                  ? 'bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300 border border-emerald-500/60 shadow-sm'
+                  : isDark
+                  ? 'text-gray-300 hover:text-white hover:bg-gray-800/80'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+              }`}
+            >
+              <Home size={14} />
+              <span>{navItems.home.name}</span>
+            </Link>
+
+            {/* Grouped menus */}
             {navGroups.map((group) => (
               <div key={group.id} className="relative">
                 <button
@@ -245,7 +262,7 @@ export default function Navbar() {
             <Link
               to="/mafunzo"
               onClick={closeAllDropdowns}
-              className="ml-2 inline-flex items-center rounded-full bg-gradient-to-r from-emerald-500 to-blue-600 px-3.5 py-1.5 text-[12px] font-semibold text-white shadow-sm shadow-emerald-500/40 hover:brightness-110"
+              className="ml-1 inline-flex items-center rounded-full bg-gradient-to-r from-emerald-500 to-blue-600 px-3.5 py-1.5 text-[12px] font-semibold text-white shadow-sm shadow-emerald-500/40 hover:brightness-110"
             >
               {language === 'sw' ? 'Jiunge na Safari' : 'Join the Journey'}
             </Link>
@@ -256,7 +273,7 @@ export default function Navbar() {
             {/* Authenticated: notifications & profile */}
             {isAuthenticated ? (
               <>
-                {/* Notifications */}
+                {/* Notifications with badge count */}
                 <div className="relative">
                   <button
                     onClick={() => {
@@ -273,7 +290,7 @@ export default function Navbar() {
                   >
                     <Bell size={18} />
                     {unreadCount > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 rounded-full bg-red-500 px-1.5 text-[9px] font-semibold text-white">
+                      <span className="absolute -top-0.5 -right-0.5 rounded-full bg-emerald-500 px-1.5 text-[9px] font-semibold text-white shadow-sm">
                         {unreadCount}
                       </span>
                     )}
@@ -293,7 +310,7 @@ export default function Navbar() {
                             : 'Recent notifications'}
                         </p>
                         {unreadCount > 0 && (
-                          <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-500 dark:text-emerald-300">
+                          <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-300">
                             {unreadCount}{' '}
                             {language === 'sw' ? 'mpya' : 'new'}
                           </span>
@@ -439,15 +456,24 @@ export default function Navbar() {
                 </div>
               </>
             ) : (
-              // Guest: Login CTA (desktop & md+)
-              <Link
-                to="/login"
-                className="hidden md:inline-flex items-center rounded-full border border-emerald-500 px-3 py-1.5 text-[12px] font-semibold text-emerald-600 hover:bg-emerald-50 dark:border-emerald-400 dark:text-emerald-300 dark:hover:bg-gray-900"
-                onClick={closeAllDropdowns}
-              >
-                <UserIcon size={14} className="mr-1.5" />
-                {t('login') || 'Ingia'}
-              </Link>
+              // Guest: Login + Register (desktop)
+              <div className="hidden md:flex items-center gap-2">
+                <Link
+                  to="/login"
+                  className="inline-flex items-center rounded-full border border-emerald-500 px-3 py-1.5 text-[12px] font-semibold text-emerald-600 hover:bg-emerald-50 dark:border-emerald-400 dark:text-emerald-300 dark:hover:bg-gray-900"
+                  onClick={closeAllDropdowns}
+                >
+                  <UserIcon size={14} className="mr-1.5" />
+                  {t('login') || 'Ingia'}
+                </Link>
+                <Link
+                  to="/register"
+                  className="inline-flex items-center rounded-full bg-gradient-to-r from-emerald-500 to-blue-600 px-3.5 py-1.5 text-[12px] font-semibold text-white shadow-sm shadow-emerald-500/40 hover:brightness-110"
+                  onClick={closeAllDropdowns}
+                >
+                  {t('register') || 'Jisajili'}
+                </Link>
+              </div>
             )}
 
             {/* Language Selector */}
@@ -546,6 +572,24 @@ export default function Navbar() {
             }`}
           >
             <div className="py-3 space-y-1 text-[11px]">
+              {/* Home standalone mobile */}
+              <div className="px-2">
+                <Link
+                  to={navItems.home.href}
+                  onClick={() => setIsOpen(false)}
+                  className={`flex items-center gap-2 rounded-lg px-2 py-2 text-[11px] font-semibold ${
+                    isActive(navItems.home.href)
+                      ? 'bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300'
+                      : isDark
+                      ? 'text-gray-200 hover:bg-gray-800 hover:text-white'
+                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                  }`}
+                >
+                  <Home size={14} />
+                  <span>{navItems.home.name}</span>
+                </Link>
+              </div>
+
               {navGroups.map((group) => (
                 <div key={group.id} className="px-2">
                   <button
@@ -598,16 +642,23 @@ export default function Navbar() {
                 </div>
               ))}
 
-              {/* Login kwa mobile (ndogo sana kama WhatsApp text) */}
+              {/* Auth buttons mobile */}
               {!isAuthenticated && (
-                <div className="px-2 pt-1">
+                <div className="px-2 pt-1 flex gap-2">
                   <Link
                     to="/login"
                     onClick={() => setIsOpen(false)}
-                    className="flex items-center justify-center gap-2 rounded-lg border border-emerald-500 px-3 py-2 text-[11px] font-semibold text-emerald-600 hover:bg-emerald-50 dark:border-emerald-400 dark:text-emerald-300 dark:hover:bg-gray-900"
+                    className="flex-1 flex items-center justify-center gap-2 rounded-lg border border-emerald-500 px-3 py-2 text-[11px] font-semibold text-emerald-600 hover:bg-emerald-50 dark:border-emerald-400 dark:text-emerald-300 dark:hover:bg-gray-900"
                   >
                     <UserIcon size={14} />
                     <span>{t('login') || 'Ingia'}</span>
+                  </Link>
+                  <Link
+                    to="/register"
+                    onClick={() => setIsOpen(false)}
+                    className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-emerald-500 to-blue-600 px-3 py-2 text-[11px] font-semibold text-white shadow-sm shadow-emerald-500/40 hover:brightness-110"
+                  >
+                    <span>{t('register') || 'Jisajili'}</span>
                   </Link>
                 </div>
               )}

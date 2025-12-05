@@ -27,6 +27,7 @@ import MediaLibrary from './pages/media/MediaLibrary';
 import MediaDetail from './pages/media/MediaDetail';
 
 import Shop from './pages/shop/Shop';
+import ShopProduct from './pages/shop/ShopProduct'; // ➕ bidhaa moja ya duka
 
 import Events from './pages/events/Events';
 import EventDetail from './pages/events/EventDetail';
@@ -58,26 +59,31 @@ function App() {
                       <Route path="/" element={<Home />} />
                       <Route path="/kuhusu-sisi" element={<About />} />
 
+                      {/* Habari */}
                       <Route path="/habari" element={<News />} />
                       <Route path="/habari/:slug" element={<NewsDetail />} />
 
+                      {/* Mafunzo */}
                       <Route path="/mafunzo" element={<BibleStudies />} />
-                      <Route
-                        path="/mafunzo/:slug"
-                        element={<LessonDetail />}
-                      />
+                      <Route path="/mafunzo/:slug" element={<LessonDetail />} />
 
+                      {/* Media */}
                       <Route path="/media" element={<MediaLibrary />} />
                       <Route path="/media/:id" element={<MediaDetail />} />
 
+                      {/* Duka (slug ya Kiswahili) */}
                       <Route path="/duka" element={<Shop />} />
+                      <Route path="/duka/:id" element={<ShopProduct />} />
 
+                      {/* Aliases za Kiingereza (hiari – unaweza kuziondoa kama hutaki) */}
+                      <Route path="/shop" element={<Shop />} />
+                      <Route path="/shop/:id" element={<ShopProduct />} />
+
+                      {/* Matukio */}
                       <Route path="/matukio" element={<Events />} />
-                      <Route
-                        path="/matukio/:slug"
-                        element={<EventDetail />}
-                      />
+                      <Route path="/matukio/:slug" element={<EventDetail />} />
 
+                      {/* Maombi & Michango */}
                       <Route path="/maombi" element={<PrayerRequests />} />
                       <Route path="/michango" element={<Donations />} />
 

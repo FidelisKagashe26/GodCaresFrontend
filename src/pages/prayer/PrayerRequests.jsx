@@ -30,9 +30,7 @@ export default function PrayerRequests() {
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState(null);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const validateForm = () => {
     const newErrors = {};
     if (!formData.anonymous && !formData.name.trim()) {
       newErrors.name = 'Jina ni lazima kama hutumii anonymous.';
@@ -46,7 +44,13 @@ export default function PrayerRequests() {
     if (!formData.request.trim()) {
       newErrors.request = 'Ombi ni lazima.';
     }
+    return newErrors;
+  };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const newErrors = validateForm();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -69,6 +73,7 @@ export default function PrayerRequests() {
 
       setSubmitted(true);
 
+      // Reset baada ya sekunde chache
       setTimeout(() => {
         setSubmitted(false);
         setFormData({
@@ -94,10 +99,34 @@ export default function PrayerRequests() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
+
+    setFormData((prev) => {
+      // handle anonymous special case
+      if (name === 'anonymous') {
+        const next = {
+          ...prev,
+          anonymous: checked,
+        };
+        // ukichagua anonymous, futa jina (hiari) na error ya jina
+        if (checked) {
+          next.name = '';
+        }
+        return next;
+      }
+
+      return {
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value,
+      };
+    });
+
+    // futa error ya field husika mara mtu akianza ku-edit
+    setErrors((prev) => {
+      if (!prev[name]) return prev;
+      const copy = { ...prev };
+      delete copy[name];
+      return copy;
+    });
   };
 
   if (submitted) {
@@ -111,17 +140,19 @@ export default function PrayerRequests() {
           className={`min-h-screen py-12 transition-colors ${
             isDark
               ? 'bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950'
-              : 'bg-gradient-to-b from-slate-50 via-white to-rose-50'
+              : 'bg-gradient-to-b from-slate-50 via-white to-emerald-50'
           }`}
         >
           <div className="container mx-auto px-4 md:px-6">
             <div
               className={`max-w-2xl mx-auto text-center rounded-2xl border p-8 md:p-12 shadow-lg ${
-                isDark ? 'bg-gray-900/90 border-gray-800' : 'bg-white border-gray-100'
+                isDark
+                  ? 'bg-gray-900/90 border-gray-800'
+                  : 'bg-white border-gray-100'
               }`}
             >
               <CheckCircle
-                className="text-green-500 mx-auto mb-6"
+                className="text-emerald-500 mx-auto mb-6"
                 size={64}
               />
               <h1
@@ -143,11 +174,11 @@ export default function PrayerRequests() {
               <div
                 className={`p-4 rounded-lg mb-6 ${
                   isDark
-                    ? 'bg-green-900/20 border border-green-800'
-                    : 'bg-green-50 border border-green-200'
+                    ? 'bg-emerald-900/20 border border-emerald-800'
+                    : 'bg-emerald-50 border border-emerald-200'
                 }`}
               >
-                <p className="text-green-700 dark:text-green-300 text-sm md:text-base font-medium">
+                <p className="text-emerald-700 dark:text-emerald-300 text-sm md:text-base font-medium">
                   "Msiwe na wasiwasi juu ya chochote, bali katika kila jambo,
                   kwa maombi na dua, pamoja na shukrani, mjulishe Mungu mahitaji
                   yenu." – Wafilipi 4:6
@@ -155,7 +186,7 @@ export default function PrayerRequests() {
               </div>
               <button
                 onClick={() => setSubmitted(false)}
-                className="bg-rose-600 hover:bg-rose-700 text-white px-6 md:px-8 py-3 rounded-lg font-semibold text-sm md:text-base transition-colors"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 md:px-8 py-3 rounded-lg font-semibold text-sm md:text-base transition-colors"
               >
                 Tuma Ombi Lingine
               </button>
@@ -177,13 +208,13 @@ export default function PrayerRequests() {
         className={`min-h-screen py-10 md:py-12 transition-colors ${
           isDark
             ? 'bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950'
-            : 'bg-gradient-to-b from-slate-50 via-white to-rose-50'
+            : 'bg-gradient-to-b from-slate-50 via-white to-emerald-50'
         }`}
       >
         <div className="container mx-auto px-4 md:px-6">
           {/* Header */}
           <header className="text-center mb-10 md:mb-12">
-            <div className="w-16 h-16 bg-gradient-to-r from-rose-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-md shadow-rose-400/50">
+            <div className="w-16 h-16 bg-gradient-to-r from-emerald-500 via-sky-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-md shadow-emerald-400/50">
               <Heart className="text-white" size={32} />
             </div>
             <h1
@@ -228,7 +259,10 @@ export default function PrayerRequests() {
                   </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-5 md:space-y-6">
+                <form
+                  onSubmit={handleSubmit}
+                  className="space-y-5 md:space-y-6"
+                >
                   {/* Personal info */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -248,7 +282,7 @@ export default function PrayerRequests() {
                         value={formData.name}
                         onChange={handleChange}
                         disabled={formData.anonymous}
-                        className={`w-full px-3 md:px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 ${
+                        className={`w-full px-3 md:px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                           errors.name ? 'border-red-500' : ''
                         } ${
                           isDark
@@ -276,7 +310,7 @@ export default function PrayerRequests() {
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
-                        className={`w-full px-3 md:px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 ${
+                        className={`w-full px-3 md:px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                           errors.email ? 'border-red-500' : ''
                         } ${
                           isDark
@@ -306,7 +340,7 @@ export default function PrayerRequests() {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      className={`w-full px-3 md:px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 ${
+                      className={`w-full px-3 md:px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                         errors.phone ? 'border-red-500' : ''
                       } ${
                         isDark
@@ -335,7 +369,7 @@ export default function PrayerRequests() {
                       name="category"
                       value={formData.category}
                       onChange={handleChange}
-                      className={`w-full px-3 md:px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 ${
+                      className={`w-full px-3 md:px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                         isDark
                           ? 'bg-gray-800 border-gray-700 text-white'
                           : 'bg-white border-gray-300 text-gray-900'
@@ -365,7 +399,7 @@ export default function PrayerRequests() {
                       value={formData.request}
                       onChange={handleChange}
                       rows={6}
-                      className={`w-full px-3 md:px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 ${
+                      className={`w-full px-3 md:px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                         errors.request ? 'border-red-500' : ''
                       } ${
                         isDark
@@ -390,7 +424,7 @@ export default function PrayerRequests() {
                         name="anonymous"
                         checked={formData.anonymous}
                         onChange={handleChange}
-                        className="w-4 h-4 text-rose-600 bg-gray-100 border-gray-300 rounded focus:ring-rose-500"
+                        className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500"
                       />
                       <label
                         htmlFor="anonymous"
@@ -408,7 +442,7 @@ export default function PrayerRequests() {
                         name="urgent"
                         checked={formData.urgent}
                         onChange={handleChange}
-                        className="w-4 h-4 text-rose-600 bg-gray-100 border-gray-300 rounded focus:ring-rose-500"
+                        className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500"
                       />
                       <label
                         htmlFor="urgent"
@@ -425,7 +459,7 @@ export default function PrayerRequests() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-rose-600 hover:bg-rose-700 disabled:bg-rose-400 text-white font-semibold px-6 py-3 rounded-lg transition-colors flex items-center justify-center text-sm md:text-base"
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white font-semibold px-6 py-3 rounded-lg transition-colors flex items-center justify-center text-sm md:text-base"
                   >
                     {loading ? (
                       <>
@@ -467,28 +501,28 @@ export default function PrayerRequests() {
                 >
                   <li className="flex items-start">
                     <Heart
-                      className="text-rose-500 mr-2 mt-0.5 flex-shrink-0"
+                      className="text-emerald-500 mr-2 mt-0.5 flex-shrink-0"
                       size={16}
                     />
                     Omba kwa moyo wa uwazi na imani.
                   </li>
                   <li className="flex items-start">
                     <Shield
-                      className="text-rose-500 mr-2 mt-0.5 flex-shrink-0"
+                      className="text-emerald-500 mr-2 mt-0.5 flex-shrink-0"
                       size={16}
                     />
                     Maombi yako yanahifadhiwa kwa siri na usalama.
                   </li>
                   <li className="flex items-start">
                     <Users
-                      className="text-rose-500 mr-2 mt-0.5 flex-shrink-0"
+                      className="text-emerald-500 mr-2 mt-0.5 flex-shrink-0"
                       size={16}
                     />
                     Timu yetu ya maombi itaombea ombi lako.
                   </li>
                   <li className="flex items-start">
                     <Clock
-                      className="text-rose-500 mr-2 mt-0.5 flex-shrink-0"
+                      className="text-emerald-500 mr-2 mt-0.5 flex-shrink-0"
                       size={16}
                     />
                     Maombi ya haraka yanapewa kipaumbele maalum.
@@ -500,16 +534,16 @@ export default function PrayerRequests() {
               <div
                 className={`rounded-2xl p-5 border ${
                   isDark
-                    ? 'bg-rose-900/20 border-rose-800'
-                    : 'bg-rose-50 border-rose-200'
+                    ? 'bg-emerald-900/20 border-emerald-800'
+                    : 'bg-emerald-50 border-emerald-200'
                 }`}
               >
-                <blockquote className="text-rose-700 dark:text-rose-200 text-sm md:text-base font-medium mb-2">
+                <blockquote className="text-emerald-700 dark:text-emerald-200 text-sm md:text-base font-medium mb-2">
                   "Msiwe na wasiwasi juu ya chochote, bali katika kila jambo,
                   kwa maombi na dua, pamoja na shukrani, mjulishe Mungu mahitaji
                   yenu."
                 </blockquote>
-                <cite className="text-rose-600 dark:text-rose-300 text-xs md:text-sm">
+                <cite className="text-emerald-600 dark:text-emerald-300 text-xs md:text-sm">
                   – Wafilipi 4:6
                 </cite>
               </div>
@@ -539,16 +573,12 @@ export default function PrayerRequests() {
                 </p>
                 <div className="space-y-2 text-xs md:text-sm">
                   <div
-                    className={
-                      isDark ? 'text-gray-300' : 'text-gray-700'
-                    }
+                    className={isDark ? 'text-gray-300' : 'text-gray-700'}
                   >
                     📞 +255 767 525 234
                   </div>
                   <div
-                    className={
-                      isDark ? 'text-gray-300' : 'text-gray-700'
-                    }
+                    className={isDark ? 'text-gray-300' : 'text-gray-700'}
                   >
                     ✉️ fmklink@gmail.com
                   </div>

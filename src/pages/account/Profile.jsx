@@ -51,6 +51,7 @@ export default function Profile() {
           location: data.location || '',
         });
       } catch (err) {
+        console.error('Profile load error:', err);
         setError(err.message || 'Imeshindikana kupakia profaili.');
       } finally {
         setLoading(false);
@@ -74,6 +75,7 @@ export default function Profile() {
       await apiService.updateProfile(form);
       setMessage('Taarifa za profaili zimehifadhiwa kikamilifu.');
     } catch (err) {
+      console.error('Profile update error:', err);
       setError(err.message || 'Imeshindikana kuhifadhi mabadiliko.');
     } finally {
       setSaving(false);
@@ -91,7 +93,6 @@ export default function Profile() {
     });
   };
 
-  // Extra fields zisizojulikana ili tusipoteze data yoyote ya API
   const extraFields = useMemo(() => {
     if (!rawProfile) return [];
     const known = new Set([
@@ -108,13 +109,28 @@ export default function Profile() {
       'is_superuser',
       'is_active',
     ]);
-    return Object.entries(rawProfile).filter(([key]) => !known.has(key));
+    return Object.entries(rawProfile).filter(
+      ([key]) => !known.has(key)
+    );
   }, [rawProfile]);
+
+  const initials = useMemo(() => {
+    const fn = form.first_name?.trim();
+    const ln = form.last_name?.trim();
+    if (fn || ln) {
+      return `${(fn || '')[0] || ''}${(ln || '')[0] || ''}`.toUpperCase();
+    }
+    const u = form.username || user?.username || user?.email || 'U';
+    return u.charAt(0).toUpperCase();
+  }, [form, user]);
 
   if (loading) {
     return (
       <>
-        <SEOHead title="Profaili Yangu" description="Dhibiti taarifa zako za akaunti" />
+        <SEOHead
+          title="Profaili Yangu"
+          description="Dhibiti taarifa zako za akaunti"
+        />
         <section
           className={`min-h-[calc(100vh-200px)] flex items-center justify-center transition-colors ${
             isDark ? 'bg-gray-900' : 'bg-gray-50'
@@ -130,7 +146,7 @@ export default function Profile() {
     <>
       <SEOHead
         title="Profaili Yangu"
-        description="Dhibiti taarifa zako binafsi na mpangilio wa akaunti katika GOD CARES 365"
+        description="Dhibiti taarifa zako binafsi na mpangilio wa akaunti katika GOD CARES 365."
       />
 
       <section
@@ -141,29 +157,36 @@ export default function Profile() {
         <div className="max-w-4xl mx-auto px-4">
           <div
             className={`rounded-2xl shadow-lg border p-6 md:p-8 ${
-              isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'
+              isDark
+                ? 'bg-gray-800 border-gray-700'
+                : 'bg-white border-gray-100'
             }`}
           >
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-start justify-between mb-6 gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center text-white">
-                  <User size={24} />
+                <div className="relative">
+                  <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-green-600 flex items-center justify-center text-white text-lg md:text-xl font-bold">
+                    {initials}
+                  </div>
+                  <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
+                    <User size={12} className="text-white" />
+                  </span>
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
                     Profaili Yangu
                   </h1>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
                     Dhibiti taarifa zako binafsi na mawasiliano.
                   </p>
                 </div>
               </div>
 
-              <div className="text-right text-xs text-gray-500 dark:text-gray-400">
+              <div className="text-right text-[11px] md:text-xs text-gray-500 dark:text-gray-400">
                 <p>{user?.username || user?.email || 'Mtumiaji'}</p>
                 {rawProfile?.date_joined && (
-                  <p className="flex items-center gap-1 justify-end">
+                  <p className="flex items-center gap-1 justify-end mt-1">
                     <CalendarDays size={12} />
                     Umejiunga: {formatDate(rawProfile.date_joined)}
                   </p>
@@ -191,7 +214,7 @@ export default function Profile() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                    <label className="block mb-1 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-200">
                       Jina la kwanza
                     </label>
                     <input
@@ -203,7 +226,7 @@ export default function Profile() {
                     />
                   </div>
                   <div>
-                    <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                    <label className="block mb-1 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-200">
                       Jina la mwisho
                     </label>
                     <input
@@ -217,7 +240,7 @@ export default function Profile() {
                 </div>
 
                 <div>
-                  <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                  <label className="block mb-1 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-200">
                     Username
                   </label>
                   <div className="relative">
@@ -235,7 +258,7 @@ export default function Profile() {
                 </div>
 
                 <div>
-                  <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                  <label className="block mb-1 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-200">
                     Barua pepe
                   </label>
                   <div className="relative">
@@ -254,7 +277,7 @@ export default function Profile() {
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                    <label className="block mb-1 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-200">
                       Namba ya simu
                     </label>
                     <div className="relative">
@@ -272,7 +295,7 @@ export default function Profile() {
                   </div>
 
                   <div>
-                    <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                    <label className="block mb-1 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-200">
                       Mahali ulipo
                     </label>
                     <div className="relative">
@@ -312,25 +335,30 @@ export default function Profile() {
                 </div>
               </form>
 
-              {/* Sidebar: taarifa za akaunti + extra fields */}
+              {/* Sidebar */}
               <aside className="space-y-4 text-sm">
                 <div
                   className={`rounded-xl p-4 ${
-                    isDark ? 'bg-gray-900 border border-gray-700' : 'bg-gray-50 border border-gray-200'
+                    isDark
+                      ? 'bg-gray-900 border border-gray-700'
+                      : 'bg-gray-50 border border-gray-200'
                   }`}
                 >
-                  <h2 className="font-semibold text-gray-900 dark:text-white mb-2">
+                  <h2 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm">
                     Muhtasari wa Akaunti
                   </h2>
                   <ul className="space-y-1 text-gray-600 dark:text-gray-300 text-xs">
                     {rawProfile?.id && (
                       <li>
-                        <span className="font-medium">ID:</span> {rawProfile.id}
+                        <span className="font-medium">ID:</span>{' '}
+                        {rawProfile.id}
                       </li>
                     )}
                     {rawProfile?.last_login && (
                       <li>
-                        <span className="font-medium">Mara ya mwisho kuingia:</span>{' '}
+                        <span className="font-medium">
+                          Mara ya mwisho kuingia:
+                        </span>{' '}
                         {formatDate(rawProfile.last_login)}
                       </li>
                     )}
@@ -365,7 +393,9 @@ export default function Profile() {
                         <li key={key} className="flex justify-between gap-2">
                           <span className="font-medium">{key}:</span>
                           <span className="truncate">
-                            {typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                            {typeof value === 'object'
+                              ? JSON.stringify(value)
+                              : String(value)}
                           </span>
                         </li>
                       ))}
