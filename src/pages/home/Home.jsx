@@ -23,7 +23,7 @@ export default function Home() {
   const { isDark } = useTheme();
   const { isAuthenticated } = useAuth();
 
-  // HATUNA API: tunatumia fake data kwenye slider tu kwa sasa
+  // Slider (picha za juu)
   const slides = [
     {
       image: '/images/picture1.jpg',
@@ -101,188 +101,202 @@ export default function Home() {
           <Carousel slides={slides} />
         </div>
 
-        {/* SAFARI YA IMANI – 3 stages */}
-        <section className="py-14 md:py-16">
-          <div className="container mx-auto px-4 md:px-6">
-            <div className="max-w-3xl mx-auto text-center mb-10">
-              <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 mb-3">
-                <Sparkles size={14} />
-                <span>Safari ya Imani • Seeker → Scholar → Missionary</span>
-              </div>
-              <h2
-                className={`text-2xl md:text-3xl font-extrabold tracking-tight mb-3 ${
-                  isDark ? 'text-white' : 'text-gray-900'
-                }`}
-              >
-                Kutoka Kugundua Kweli hadi Kuishi Ujumbe
-              </h2>
-              <p
-                className={`text-sm md:text-base leading-relaxed ${
-                  isDark ? 'text-gray-300' : 'text-gray-600'
-                }`}
-              >
-                God Cares 365 inakusaidia kusonga hatua kwa hatua: kwanza
-                kugundua Neno, kisha kuelewa unabii, na mwishowe kuishi kama
-                mmishenari wa kila siku.
-              </p>
-            </div>
+        {/* SAFARI YA IMANI – na background picture ya nyuma */}
+        <section className="relative py-14 md:py-16">
+          {/* Background image ya section nzima */}
+          <div className="pointer-events-none absolute inset-0 opacity-10">
+            <img
+              src="/images/picture2.jpg"
+              alt="Prayer background"
+              className="w-full h-full object-cover"
+            />
+          </div>
 
-            <div className="grid gap-5 md:grid-cols-3">
-              {/* Stage 1 */}
-              <div
-                className={`relative overflow-hidden rounded-2xl border p-5 md:p-6 shadow-sm ${
-                  isDark
-                    ? 'bg-gray-900/60 border-gray-800'
-                    : 'bg-white border-emerald-50'
-                }`}
-              >
-                <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 via-emerald-500 to-sky-500" />
-                <div className="mt-2 mb-4 flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-300">
-                    <BookOpen size={20} />
-                  </div>
-                  <div>
-                    <p className="text-[11px] uppercase tracking-wide text-emerald-500 font-semibold">
-                      Stage 1
-                    </p>
-                    <h3
-                      className={`text-base md:text-lg font-bold ${
-                        isDark ? 'text-white' : 'text-gray-900'
-                      }`}
-                    >
-                      The Seeker – Discover Truth
-                    </h3>
-                  </div>
+          {/* Overlay gradient */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/70 via-white/80 to-white/90 dark:from-gray-950/90 dark:via-gray-950/85 dark:to-gray-950/95" />
+
+          {/* Content halisi */}
+          <div className="relative">
+            <div className="container mx-auto px-4 md:px-6">
+              <div className="max-w-3xl mx-auto text-center mb-10">
+                <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 mb-3">
+                  <Sparkles size={14} />
+                  <span>Safari ya Imani • Seeker → Scholar → Missionary</span>
                 </div>
+                <h2
+                  className={`text-2xl md:text-3xl font-extrabold tracking-tight mb-3 ${
+                    isDark ? 'text-white' : 'text-gray-900'
+                  }`}
+                >
+                  Kutoka Kugundua Kweli hadi Kuishi Ujumbe
+                </h2>
                 <p
-                  className={`text-sm mb-4 ${
+                  className={`text-sm md:text-base leading-relaxed ${
                     isDark ? 'text-gray-300' : 'text-gray-600'
                   }`}
                 >
-                  Masomo ya msingi ya Biblia: upendo wa Mungu, wokovu, ubatizo,
-                  afya na tumaini la kurudi kwa Yesu.
+                  God Cares 365 inakusaidia kusonga hatua kwa hatua: kwanza
+                  kugundua Neno, kisha kuelewa unabii, na mwishowe kuishi kama
+                  mmishenari wa kila siku.
                 </p>
-                <div className="mb-3 h-1.5 w-full rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
-                  <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500" />
-                </div>
-                <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-4">
-                  Wastani wa wanafunzi wako hapa kabla ya kuendelea na Unabii.
-                </p>
-                <Link
-                  to="/mafunzo"
-                  className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-emerald-600 hover:text-emerald-700 dark:text-emerald-300"
-                >
-                  Anza na masomo ya msingi
-                  <ArrowRight size={14} />
-                </Link>
               </div>
 
-              {/* Stage 2 */}
-              <div
-                className={`relative overflow-hidden rounded-2xl border p-5 md:p-6 shadow-sm ${
-                  isDark
-                    ? 'bg-gray-900/60 border-gray-800'
-                    : 'bg-white border-indigo-50'
-                }`}
-              >
-                <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-400 via-purple-500 to-violet-500" />
-                <div className="mt-2 mb-4 flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-300">
-                    <Sparkles size={20} />
+              {/* 3 Stage cards – full image background cards */}
+              <div className="grid gap-5 md:grid-cols-3">
+                {/* Stage 1 */}
+                <div className="relative group rounded-2xl overflow-hidden shadow-sm border border-emerald-100/70 dark:border-gray-800 bg-black">
+                  <div className="absolute inset-0">
+                    <img
+                      src="/images/picture1.jpg"
+                      alt="Bible discovery"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/20 group-hover:from-black/70 group-hover:via-black/40 group-hover:to-black/10 transition-colors" />
                   </div>
-                  <div>
-                    <p className="text-[11px] uppercase tracking-wide text-indigo-500 font-semibold">
-                      Stage 2
-                    </p>
-                    <h3
-                      className={`text-base md:text-lg font-bold ${
-                        isDark ? 'text-white' : 'text-gray-900'
-                      }`}
-                    >
-                      The Scholar – Understand Prophecy
-                    </h3>
-                  </div>
-                </div>
-                <p
-                  className={`text-sm mb-4 ${
-                    isDark ? 'text-gray-300' : 'text-gray-600'
-                  }`}
-                >
-                  Mafunzo ya Danieli na Ufunuo, Sabato ya kweli, Patakatifu na
-                  mpango wa hukumu ya Mungu.
-                </p>
-                <div className="mb-3 h-1.5 w-full rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
-                  <div className="h-full w-1/2 rounded-full bg-gradient-to-r from-indigo-400 to-purple-500" />
-                </div>
-                <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-4">
-                  Wanafunzi waliohitimu hapa wako tayari kuanza kushirikisha
-                  kweli.
-                </p>
-                <Link
-                  to="/mafunzo"
-                  className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-300"
-                >
-                  Tazama masomo ya unabii
-                  <ArrowRight size={14} />
-                </Link>
-              </div>
 
-              {/* Stage 3 */}
-              <div
-                className={`relative overflow-hidden rounded-2xl border p-5 md:p-6 shadow-sm ${
-                  isDark
-                    ? 'bg-gray-900/60 border-gray-800'
-                    : 'bg-white border-amber-50'
-                }`}
-              >
-                <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500" />
-                <div className="mt-2 mb-4 flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-300">
-                    <Globe2 size={20} />
-                  </div>
-                  <div>
-                    <p className="text-[11px] uppercase tracking-wide text-amber-500 font-semibold">
-                      Stage 3
-                    </p>
-                    <h3
-                      className={`text-base md:text-lg font-bold ${
-                        isDark ? 'text-white' : 'text-gray-900'
-                      }`}
-                    >
-                      The Missionary – Live & Share
-                    </h3>
+                  <div className="relative flex flex-col justify-between h-64 p-5 md:p-6">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-200">
+                        <BookOpen size={20} />
+                      </div>
+                      <div>
+                        <p className="text-[11px] uppercase tracking-wide text-emerald-300 font-semibold">
+                          Stage 1
+                        </p>
+                        <h3 className="text-base md:text-lg font-bold text-white">
+                          The Seeker – Discover Truth
+                        </h3>
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-xs md:text-sm mb-3 text-emerald-50/90">
+                        Masomo ya msingi ya Biblia: upendo wa Mungu, wokovu,
+                        ubatizo, afya na tumaini la kurudi kwa Yesu.
+                      </p>
+                      <div className="mb-2 h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
+                        <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500" />
+                      </div>
+                      <p className="text-[11px] text-emerald-100/80 mb-3">
+                        Wengi huanzia hapa kabla ya kuingia kwenye unabii wa
+                        kina.
+                      </p>
+                      <Link
+                        to="/mafunzo"
+                        className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-emerald-200 hover:text-white"
+                      >
+                        Anza na masomo ya msingi
+                        <ArrowRight size={14} />
+                      </Link>
+                    </div>
                   </div>
                 </div>
-                <p
-                  className={`text-sm mb-4 ${
-                    isDark ? 'text-gray-300' : 'text-gray-600'
-                  }`}
-                >
-                  Kuongoza vikundi vya Biblia, kushuhudia, na kupeleka habari za
-                  wokovu kutoka mlango hadi mlango na mtandaoni.
-                </p>
-                <div className="mb-3 h-1.5 w-full rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
-                  <div className="h-full w-1/3 rounded-full bg-gradient-to-r from-amber-400 to-rose-500" />
+
+                {/* Stage 2 */}
+                <div className="relative group rounded-2xl overflow-hidden shadow-sm border border-indigo-100/70 dark:border-gray-800 bg-black">
+                  <div className="absolute inset-0">
+                    <img
+                      src="/images/picture2.jpg"
+                      alt="Prophecy studies"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/20 group-hover:from-black/70 group-hover:via-black/40 group-hover:to-black/10 transition-colors" />
+                  </div>
+
+                  <div className="relative flex flex-col justify-between h-64 p-5 md:p-6">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-100">
+                        <Sparkles size={20} />
+                      </div>
+                      <div>
+                        <p className="text-[11px] uppercase tracking-wide text-indigo-200 font-semibold">
+                          Stage 2
+                        </p>
+                        <h3 className="text-base md:text-lg font-bold text-white">
+                          The Scholar – Understand Prophecy
+                        </h3>
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-xs md:text-sm mb-3 text-indigo-50/90">
+                        Mafunzo ya Danieli &amp; Ufunuo, Sabato ya kweli,
+                        Patakatifu na mpango wa hukumu ya Mungu.
+                      </p>
+                      <div className="mb-2 h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
+                        <div className="h-full w-1/2 rounded-full bg-gradient-to-r from-indigo-400 to-purple-500" />
+                      </div>
+                      <p className="text-[11px] text-indigo-100/80 mb-3">
+                        Wanafunzi waliokomaa hapa wako tayari kwa mission ya
+                        kushirikisha kweli.
+                      </p>
+                      <Link
+                        to="/mafunzo"
+                        className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-indigo-100 hover:text-white"
+                      >
+                        Tazama masomo ya unabii
+                        <ArrowRight size={14} />
+                      </Link>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-4">
-                  Hapa ndipo God Cares 365 inakuwa harakati ya kimissioni, si
-                  tu darasa la mtandaoni.
-                </p>
-                <Link
-                  to={isAuthenticated ? '/profile' : '/login'}
-                  className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-amber-600 hover:text-amber-700 dark:text-amber-300"
-                >
-                  {isAuthenticated
-                    ? 'Fungua dashibodi ya mission'
-                    : 'Ingia uanze mission'}
-                  <ArrowRight size={14} />
-                </Link>
+
+                {/* Stage 3 */}
+                <div className="relative group rounded-2xl overflow-hidden shadow-sm border border-amber-100/70 dark:border-gray-800 bg-black">
+                  <div className="absolute inset-0">
+                    <img
+                      src="/images/picture3.jpg"
+                      alt="Missionary work"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/20 group-hover:from-black/70 group-hover:via-black/40 group-hover:to-black/10 transition-colors" />
+                  </div>
+
+                  <div className="relative flex flex-col justify-between h-64 p-5 md:p-6">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/20 text-amber-100">
+                        <Globe2 size={20} />
+                      </div>
+                      <div>
+                        <p className="text-[11px] uppercase tracking-wide text-amber-200 font-semibold">
+                          Stage 3
+                        </p>
+                        <h3 className="text-base md:text-lg font-bold text-white">
+                          The Missionary – Live &amp; Share
+                        </h3>
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-xs md:text-sm mb-3 text-amber-50/90">
+                        Kuongoza vikundi vya Biblia, kushuhudia, na kufikia
+                        watu ana kwa ana na mtandaoni.
+                      </p>
+                      <div className="mb-2 h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
+                        <div className="h-full w-1/3 rounded-full bg-gradient-to-r from-amber-400 to-emerald-500" />
+                      </div>
+                      <p className="text-[11px] text-amber-100/80 mb-3">
+                        Hapa God Cares 365 inageuka kuwa harakati hai ya
+                        kimissioni.
+                      </p>
+                      <Link
+                        to={isAuthenticated ? '/profile' : '/login'}
+                        className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-amber-100 hover:text-white"
+                      >
+                        {isAuthenticated
+                          ? 'Fungua dashibodi ya mission'
+                          : 'Ingia uanze mission'}
+                        <ArrowRight size={14} />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* FEATURES: Chagua Kituo */}
+        {/* FEATURES: Chagua Kituo – kila card ni full image background */}
         <section className="pb-16">
           <div className="container mx-auto px-4 md:px-6">
             <div className="flex items-center justify-between gap-2 mb-6">
@@ -302,248 +316,270 @@ export default function Home() {
               {/* Bible Studies */}
               <Link
                 to="/mafunzo"
-                className={`group relative overflow-hidden rounded-2xl border p-6 text-left shadow-sm transition-all hover:-translate-y-1 hover:shadow-md ${
+                className={`group relative overflow-hidden rounded-2xl border shadow-sm transition-all hover:-translate-y-1 hover:shadow-md ${
                   isDark
-                    ? 'bg-gray-900/80 border-gray-800 hover:border-emerald-500/60'
-                    : 'bg-white border-gray-100 hover:border-emerald-500/40'
+                    ? 'border-gray-800 bg-black'
+                    : 'border-gray-100 bg-black'
                 }`}
               >
-                <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-emerald-400 to-sky-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="mb-4 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-300">
-                      <BookOpen size={24} />
+                <div className="absolute inset-0">
+                  <img
+                    src="/images/MasomoYaBiblia.jpg"
+                    alt="Masomo ya Biblia"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/55 to-black/20 group-hover:from-black/75 group-hover:via-black/45 group-hover:to-black/10 transition-colors" />
+                </div>
+
+                <div className="relative flex flex-col justify-between h-64 p-5">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/25 text-emerald-100">
+                      <BookOpen size={20} />
                     </div>
                     <div>
-                      <h3
-                        className={`text-lg font-semibold ${
-                          isDark ? 'text-white' : 'text-gray-900'
-                        }`}
-                      >
+                      <h3 className="text-base font-semibold text-white">
                         Masomo ya Biblia
                       </h3>
-                      <p className="text-[11px] uppercase tracking-wide text-emerald-500 font-semibold">
-                        Discovery & Prophecy
+                      <p className="text-[11px] uppercase tracking-wide text-emerald-200 font-semibold">
+                        Discovery &amp; Prophecy
                       </p>
                     </div>
                   </div>
-                </div>
-                <p
-                  className={`text-sm mb-4 ${
-                    isDark ? 'text-gray-300' : 'text-gray-600'
-                  }`}
-                >
-                  Masomo yaliyopangwa kwa misimu: misingi ya imani, Danieli &
-                  Ufunuo, na maisha ya ushuhuda.
-                </p>
-                <div className="flex items-center text-[12px] font-semibold text-emerald-600 group-hover:text-emerald-700 dark:text-emerald-300">
-                  <span className="mr-2">Fungua masomo</span>
-                  <ArrowRight size={14} />
+                  <div>
+                    <p className="text-xs md:text-sm mb-4 text-emerald-50/90">
+                      Masomo yaliyopangwa kwa misimu: misingi ya imani, Danieli
+                      &amp; Ufunuo, na maisha ya ushuhuda.
+                    </p>
+                    <div className="flex items-center text-[12px] font-semibold text-emerald-100 group-hover:text-white">
+                      <span className="mr-2">Fungua masomo</span>
+                      <ArrowRight size={14} />
+                    </div>
+                  </div>
                 </div>
               </Link>
 
               {/* Prayer Requests */}
               <Link
                 to="/maombi"
-                className={`group relative overflow-hidden rounded-2xl border p-6 text-left shadow-sm transition-all hover:-translate-y-1 hover:shadow-md ${
+                className={`group relative overflow-hidden rounded-2xl border shadow-sm transition-all hover:-translate-y-1 hover:shadow-md ${
                   isDark
-                    ? 'bg-gray-900/80 border-gray-800 hover:border-rose-500/60'
-                    : 'bg-white border-gray-100 hover:border-rose-500/40'
+                    ? 'border-gray-800 bg-black'
+                    : 'border-gray-100 bg-black'
                 }`}
               >
-                <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-rose-400 to-red-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-rose-50 text-rose-600 group-hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-300">
-                    <Heart size={24} />
+                <div className="absolute inset-0">
+                  <img
+                    src="/images/maombi.jpg"
+                    alt="Maombi"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/55 to-black/20 group-hover:from-black/75 group-hover:via-black/45 group-hover:to-black/10 transition-colors" />
+                </div>
+
+                <div className="relative flex flex-col justify-between h-64 p-5">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/25 text-emerald-100">
+                      <Heart size={20} />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-semibold text-white">
+                        Maombi
+                      </h3>
+                      <p className="text-[11px] uppercase tracking-wide text-emerald-200 font-semibold">
+                        Prayer &amp; Support
+                      </p>
+                    </div>
                   </div>
                   <div>
-                    <h3
-                      className={`text-lg font-semibold ${
-                        isDark ? 'text-white' : 'text-gray-900'
-                      }`}
-                    >
-                      Maombi
-                    </h3>
-                    <p className="text-[11px] uppercase tracking-wide text-rose-500 font-semibold">
-                      Prayer & Support
+                    <p className="text-xs md:text-sm mb-4 text-emerald-50/90">
+                      Tuma maombi binafsi, ya familia au huduma – na tuombe
+                      pamoja kama mwili wa Kristo.
                     </p>
+                    <div className="flex items-center text-[12px] font-semibold text-emerald-100 group-hover:text-white">
+                      <span className="mr-2">Omba nasi</span>
+                      <ArrowRight size={14} />
+                    </div>
                   </div>
-                </div>
-                <p
-                  className={`text-sm mb-4 ${
-                    isDark ? 'text-gray-300' : 'text-gray-600'
-                  }`}
-                >
-                  Tuma maombi binafsi, maombi ya familia, au maombi ya huduma –
-                  na tuombe pamoja kama mwili wa Kristo.
-                </p>
-                <div className="flex items-center text-[12px] font-semibold text-rose-600 group-hover:text-rose-700 dark:text-rose-300">
-                  <span className="mr-2">Omba nasi</span>
-                  <ArrowRight size={14} />
                 </div>
               </Link>
 
               {/* News */}
               <Link
                 to="/habari"
-                className={`group relative overflow-hidden rounded-2xl border p-6 text-left shadow-sm transition-all hover:-translate-y-1 hover:shadow-md ${
+                className={`group relative overflow-hidden rounded-2xl border shadow-sm transition-all hover:-translate-y-1 hover:shadow-md ${
                   isDark
-                    ? 'bg-gray-900/80 border-gray-800 hover:border-sky-500/60'
-                    : 'bg-white border-gray-100 hover:border-sky-500/40'
+                    ? 'border-gray-800 bg-black'
+                    : 'border-gray-100 bg-black'
                 }`}
               >
-                <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-sky-400 to-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sky-50 text-sky-600 group-hover:bg-sky-100 dark:bg-sky-500/10 dark:text-sky-300">
-                    <Users size={24} />
+                <div className="absolute inset-0">
+                  <img
+                    src="/images/habari.webp"
+                    alt="Habari na Vipengele"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/55 to-black/20 group-hover:from-black/75 group-hover:via-black/45 group-hover:to-black/10 transition-colors" />
+                </div>
+
+                <div className="relative flex flex-col justify-between h-64 p-5">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-sky-500/25 text-sky-100">
+                      <Users size={20} />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-semibold text-white">
+                        Habari &amp; Vipengele
+                      </h3>
+                      <p className="text-[11px] uppercase tracking-wide text-sky-200 font-semibold">
+                        Stories &amp; Testimonies
+                      </p>
+                    </div>
                   </div>
                   <div>
-                    <h3
-                      className={`text-lg font-semibold ${
-                        isDark ? 'text-white' : 'text-gray-900'
-                      }`}
-                    >
-                      Habari & Vipengele
-                    </h3>
-                    <p className="text-[11px] uppercase tracking-wide text-sky-500 font-semibold">
-                      Stories & Testimonies
+                    <p className="text-xs md:text-sm mb-4 text-sky-50/90">
+                      Makala za kiroho, ushuhuda wa watumishi na taarifa za
+                      harakati za God Cares 365.
                     </p>
+                    <div className="flex items-center text-[12px] font-semibold text-sky-100 group-hover:text-white">
+                      <span className="mr-2">Soma habari</span>
+                      <ArrowRight size={14} />
+                    </div>
                   </div>
-                </div>
-                <p
-                  className={`text-sm mb-4 ${
-                    isDark ? 'text-gray-300' : 'text-gray-600'
-                  }`}
-                >
-                  Tafakari makala za kiroho, ushuhuda wa watumishi na taarifa
-                  za harakati za God Cares 365.
-                </p>
-                <div className="flex items-center text-[12px] font-semibold text-sky-600 group-hover:text-sky-700 dark:text-sky-300">
-                  <span className="mr-2">Soma habari</span>
-                  <ArrowRight size={14} />
                 </div>
               </Link>
 
               {/* Events */}
               <Link
                 to="/matukio"
-                className={`group relative overflow-hidden rounded-2xl border p-6 text-left shadow-sm transition-all hover:-translate-y-1 hover:shadow-md ${
+                className={`group relative overflow-hidden rounded-2xl border shadow-sm transition-all hover:-translate-y-1 hover:shadow-md ${
                   isDark
-                    ? 'bg-gray-900/80 border-gray-800 hover:border-purple-500/60'
-                    : 'bg-white border-gray-100 hover:border-purple-500/40'
+                    ? 'border-gray-800 bg-black'
+                    : 'border-gray-100 bg-black'
                 }`}
               >
-                <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-purple-400 to-violet-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-50 text-purple-600 group-hover:bg-purple-100 dark:bg-purple-500/10 dark:text-purple-300">
-                    <Calendar size={24} />
+                <div className="absolute inset-0">
+                  <img
+                    src="/images/matukio.jpg"
+                    alt="Matukio Maalum"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/55 to-black/20 group-hover:from-black/75 group-hover:via-black/45 group-hover:to-black/10 transition-colors" />
+                </div>
+
+                <div className="relative flex flex-col justify-between h-64 p-5">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500/25 text-blue-100">
+                      <Calendar size={20} />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-semibold text-white">
+                        Matukio Maalum
+                      </h3>
+                      <p className="text-[11px] uppercase tracking-wide text-blue-200 font-semibold">
+                        Seminars &amp; Gatherings
+                      </p>
+                    </div>
                   </div>
                   <div>
-                    <h3
-                      className={`text-lg font-semibold ${
-                        isDark ? 'text-white' : 'text-gray-900'
-                      }`}
-                    >
-                      Matukio Maalum
-                    </h3>
-                    <p className="text-[11px] uppercase tracking-wide text-purple-500 font-semibold">
-                      Seminars & Gatherings
+                    <p className="text-xs md:text-sm mb-4 text-blue-50/90">
+                      Semina, kambi za injili, warsha na ibada za kipekee –
+                      mtandaoni na ana kwa ana.
                     </p>
+                    <div className="flex items-center text-[12px] font-semibold text-blue-100 group-hover:text-white">
+                      <span className="mr-2">Angalia matukio</span>
+                      <ArrowRight size={14} />
+                    </div>
                   </div>
-                </div>
-                <p
-                  className={`text-sm mb-4 ${
-                    isDark ? 'text-gray-300' : 'text-gray-600'
-                  }`}
-                >
-                  Hudhuria semina, kambi za injili, warsha na ibada za kipekee
-                  mtandaoni na ana kwa ana.
-                </p>
-                <div className="flex items-center text-[12px] font-semibold text-purple-600 group-hover:text-purple-700 dark:text-purple-300">
-                  <span className="mr-2">Angalia matukio</span>
-                  <ArrowRight size={14} />
                 </div>
               </Link>
 
               {/* Media Library */}
               <Link
                 to="/media"
-                className={`group relative overflow-hidden rounded-2xl border p-6 text-left shadow-sm transition-all hover:-translate-y-1 hover:shadow-md ${
+                className={`group relative overflow-hidden rounded-2xl border shadow-sm transition-all hover:-translate-y-1 hover:shadow-md ${
                   isDark
-                    ? 'bg-gray-900/80 border-gray-800 hover:border-amber-500/60'
-                    : 'bg-white border-gray-100 hover:border-amber-500/40'
+                    ? 'border-gray-800 bg-black'
+                    : 'border-gray-100 bg-black'
                 }`}
               >
-                <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-amber-400 to-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-50 text-amber-600 group-hover:bg-amber-100 dark:bg-amber-500/10 dark:text-amber-300">
-                    <Play size={24} />
+                <div className="absolute inset-0">
+                  <img
+                    src="/images/media.jpeg"
+                    alt="Maktaba ya Media"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/55 to-black/20 group-hover:from-black/75 group-hover:via-black/45 group-hover:to-black/10 transition-colors" />
+                </div>
+
+                <div className="relative flex flex-col justify-between h-64 p-5">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500/25 text-amber-100">
+                      <Play size={20} />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-semibold text-white">
+                        Maktaba ya Media
+                      </h3>
+                      <p className="text-[11px] uppercase tracking-wide text-amber-200 font-semibold">
+                        Video • Audio • Resources
+                      </p>
+                    </div>
                   </div>
                   <div>
-                    <h3
-                      className={`text-lg font-semibold ${
-                        isDark ? 'text-white' : 'text-gray-900'
-                      }`}
-                    >
-                      Maktaba ya Media
-                    </h3>
-                    <p className="text-[11px] uppercase tracking-wide text-amber-500 font-semibold">
-                      Video • Audio • Resources
+                    <p className="text-xs md:text-sm mb-4 text-amber-50/90">
+                      Tazama mahubiri, vipindi, nyimbo na rasilimali za media
+                      popote ulipo.
                     </p>
+                    <div className="flex items-center text-[12px] font-semibold text-amber-100 group-hover:text-white">
+                      <span className="mr-2">Fungua maktaba</span>
+                      <ArrowRight size={14} />
+                    </div>
                   </div>
-                </div>
-                <p
-                  className={`text-sm mb-4 ${
-                    isDark ? 'text-gray-300' : 'text-gray-600'
-                  }`}
-                >
-                  Tazama mahubiri, vipindi, nyimbo na rasilimali za sauti na
-                  video, popote ulipo.
-                </p>
-                <div className="flex items-center text-[12px] font-semibold text-amber-600 group-hover:text-amber-700 dark:text-amber-300">
-                  <span className="mr-2">Fungua maktaba</span>
-                  <ArrowRight size={14} />
                 </div>
               </Link>
 
               {/* Donations */}
               <Link
                 to="/michango"
-                className={`group relative overflow-hidden rounded-2xl border p-6 text-left shadow-sm transition-all hover:-translate-y-1 hover:shadow-md ${
+                className={`group relative overflow-hidden rounded-2xl border shadow-sm transition-all hover:-translate-y-1 hover:shadow-md ${
                   isDark
-                    ? 'bg-gray-900/80 border-gray-800 hover:border-emerald-500/60'
-                    : 'bg-white border-gray-100 hover:border-emerald-500/40'
+                    ? 'border-gray-800 bg-black'
+                    : 'border-gray-100 bg-black'
                 }`}
               >
-                <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-emerald-400 to-lime-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-300">
-                    <Star size={24} />
+                <div className="absolute inset-0">
+                  <img
+                    src="/images/sadaka.jpg"
+                    alt="Michango"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/55 to-black/20 group-hover:from-black/75 group-hover:via-black/45 group-hover:to-black/10 transition-colors" />
+                </div>
+
+                <div className="relative flex flex-col justify-between h-64 p-5">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/25 text-emerald-100">
+                      <Star size={20} />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-semibold text-white">
+                        Michango
+                      </h3>
+                      <p className="text-[11px] uppercase tracking-wide text-emerald-200 font-semibold">
+                        Support the Mission
+                      </p>
+                    </div>
                   </div>
                   <div>
-                    <h3
-                      className={`text-lg font-semibold ${
-                        isDark ? 'text-white' : 'text-gray-900'
-                      }`}
-                    >
-                      Michango
-                    </h3>
-                    <p className="text-[11px] uppercase tracking-wide text-emerald-500 font-semibold">
-                      Support the Mission
+                    <p className="text-xs md:text-sm mb-4 text-emerald-50/90">
+                      Changia kazi ya Mungu, media, mission za vijana na vikundi
+                      vya Biblia duniani kote.
                     </p>
+                    <div className="flex items-center text-[12px] font-semibold text-emerald-100 group-hover:text-white">
+                      <span className="mr-2">Changia sasa</span>
+                      <ArrowRight size={14} />
+                    </div>
                   </div>
-                </div>
-                <p
-                  className={`text-sm mb-4 ${
-                    isDark ? 'text-gray-300' : 'text-gray-600'
-                  }`}
-                >
-                  Changia kazi ya Mungu, kusaidia media, mission za vijana, na
-                  vikundi vya Biblia duniani kote.
-                </p>
-                <div className="flex items-center text-[12px] font-semibold text-emerald-600 group-hover:text-emerald-700 dark:text-emerald-300">
-                  <span className="mr-2">Changia sasa</span>
-                  <ArrowRight size={14} />
                 </div>
               </Link>
             </div>
@@ -583,7 +619,7 @@ export default function Home() {
                     isDark ? 'text-white' : 'text-gray-900'
                   }`}
                 >
-                  Jiunge na Jarida la Maombi & Mafunzo
+                  Jiunge na Jarida la Maombi &amp; Mafunzo
                 </h2>
                 <p
                   className={`text-sm md:text-base ${
