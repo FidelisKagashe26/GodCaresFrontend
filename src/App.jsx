@@ -16,13 +16,21 @@ import RequireAuth from './pages/User/Components/RequireAuth';
 // Public pages
 import Home from './pages/home/Home';
 import About from './pages/About';
+
 import News from './pages/news/News';
 import NewsDetail from './pages/news/NewsDetail';
-import BibleStudies from './pages/BibleStudies';
+
+import BibleStudies from './pages/lessons/BibleStudies';
 import LessonDetail from './pages/lessons/LessonDetail';
+
 import MediaLibrary from './pages/media/MediaLibrary';
+import MediaDetail from './pages/media/MediaDetail';
+
 import Shop from './pages/shop/Shop';
+
 import Events from './pages/events/Events';
+import EventDetail from './pages/events/EventDetail';
+
 import PrayerRequests from './pages/prayer/PrayerRequests';
 import Donations from './pages/Donations';
 
@@ -40,9 +48,8 @@ function App() {
         <LanguageProvider>
           <AuthProvider>
             <BrowserRouter>
-              {/* PageLoader unaweza kuwa ana-listen kwa route change / suspense */}
               <PageLoader>
-                <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors">
+                <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-emerald-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 text-gray-900 dark:text-white transition-colors">
                   <Navbar />
 
                   <main className="min-h-[calc(100vh-160px)]">
@@ -55,11 +62,22 @@ function App() {
                       <Route path="/habari/:slug" element={<NewsDetail />} />
 
                       <Route path="/mafunzo" element={<BibleStudies />} />
-                      <Route path="/mafunzo/:slug" element={<LessonDetail />} />
+                      <Route
+                        path="/mafunzo/:slug"
+                        element={<LessonDetail />}
+                      />
 
                       <Route path="/media" element={<MediaLibrary />} />
+                      <Route path="/media/:id" element={<MediaDetail />} />
+
                       <Route path="/duka" element={<Shop />} />
+
                       <Route path="/matukio" element={<Events />} />
+                      <Route
+                        path="/matukio/:slug"
+                        element={<EventDetail />}
+                      />
+
                       <Route path="/maombi" element={<PrayerRequests />} />
                       <Route path="/michango" element={<Donations />} />
 

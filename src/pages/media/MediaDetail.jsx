@@ -35,7 +35,6 @@ export default function MediaDetail() {
       setLoading(true);
       setError(null);
       try {
-        // /media/<id>/ kupitia apiService
         const data = await apiService.getMediaItem(id);
         setItem(data);
       } catch (err) {
@@ -54,10 +53,12 @@ export default function MediaDetail() {
     return (
       <div
         className={`min-h-screen py-12 transition-colors ${
-          isDark ? 'bg-gray-900' : 'bg-gray-50'
+          isDark
+            ? 'bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950'
+            : 'bg-gradient-to-b from-slate-50 via-white to-emerald-50'
         }`}
       >
-        <div className="container mx-auto px-6 flex items-center justify-center min-h-[400px]">
+        <div className="container mx-auto px-4 md:px-6 flex items-center justify-center min-h-[400px]">
           <LoadingSpinner text="Inapakia media..." size="lg" />
         </div>
       </div>
@@ -68,21 +69,25 @@ export default function MediaDetail() {
     return (
       <div
         className={`min-h-screen py-12 transition-colors ${
-          isDark ? 'bg-gray-900' : 'bg-gray-50'
+          isDark
+            ? 'bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950'
+            : 'bg-gradient-to-b from-slate-50 via-white to-emerald-50'
         }`}
       >
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto px-4 md:px-6">
           <div
-            className={`text-center card p-8 ${
-              isDark ? 'bg-gray-800' : 'bg-white'
+            className={`text-center rounded-2xl border px-6 py-10 ${
+              isDark
+                ? 'bg-gray-900/85 border-gray-800'
+                : 'bg-white/95 border-gray-100'
             }`}
           >
-            <p className="text-red-600 text-lg">
+            <p className="text-red-600 text-base md:text-lg">
               {error || 'Media haijapatikana.'}
             </p>
             <Link
               to="/media"
-              className="inline-flex items-center mt-4 text-purple-600 hover:text-purple-700"
+              className="inline-flex items-center mt-4 text-emerald-600 hover:text-emerald-700 dark:text-emerald-300 text-sm font-semibold"
             >
               <ArrowLeft size={16} className="mr-1" />
               Rudi kwenye Maktaba ya Media
@@ -105,56 +110,60 @@ export default function MediaDetail() {
 
   return (
     <div
-      className={`min-h-screen py-12 transition-colors ${
-        isDark ? 'bg-gray-900' : 'bg-gray-50'
+      className={`min-h-screen py-10 md:py-12 transition-colors ${
+        isDark
+          ? 'bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950'
+          : 'bg-gradient-to-b from-slate-50 via-white to-emerald-50'
       }`}
     >
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-4 md:px-6">
         {/* Back */}
         <Link
           to="/media"
-          className="inline-flex items-center mb-8 text-purple-600 hover:text-purple-700 transition-colors"
+          className="inline-flex items-center mb-6 md:mb-8 text-emerald-600 hover:text-emerald-700 dark:text-emerald-300 text-xs md:text-sm font-semibold"
         >
           <ArrowLeft size={16} className="mr-1" />
           Rudi kwenye Maktaba ya Media
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 md:gap-8">
           {/* Main */}
           <div className="lg:col-span-3">
             <div
-              className={`card p-8 ${
-                isDark ? 'bg-gray-800' : 'bg-white'
+              className={`rounded-2xl border shadow-sm p-5 md:p-7 ${
+                isDark
+                  ? 'bg-gray-900/85 border-gray-800'
+                  : 'bg-white/95 border-gray-100'
               }`}
             >
               {/* Header */}
-              <header className="mb-6">
-                <div className="flex items-center space-x-3 mb-3">
+              <header className="mb-6 md:mb-8">
+                <div className="flex items-center flex-wrap gap-3 mb-3">
                   {isVideo && (
-                    <Play className="text-red-500" size={24} />
+                    <Play className="text-sky-500" size={24} />
                   )}
                   {isAudio && (
-                    <FileText className="text-purple-500" size={24} />
+                    <FileText className="text-emerald-500" size={24} />
                   )}
                   {isDocument && (
-                    <Download className="text-blue-500" size={24} />
+                    <Download className="text-blue-600" size={24} />
                   )}
                   {isImage && (
-                    <Image className="text-green-500" size={24} />
+                    <Image className="text-yellow-400" size={24} />
                   )}
                   <h1
-                    className={`text-2xl md:text-3xl font-bold ${
-                      isDark ? 'text-white' : 'text-gray-800'
+                    className={`text-xl md:text-2xl lg:text-3xl font-extrabold ${
+                      isDark ? 'text-white' : 'text-gray-900'
                     }`}
                   >
                     {item.title}
                   </h1>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-4 text-sm">
-                  <div className="flex flex-wrap gap-4 items-center">
+                <div className="flex flex-wrap items-center justify-between gap-3 text-[11px] md:text-xs">
+                  <div className="flex flex-wrap gap-3 items-center">
                     {item.category_name && (
-                      <span className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded-full text-xs">
+                      <span className="bg-emerald-50 dark:bg-gray-800 px-2.5 py-1 rounded-full text-[11px] text-emerald-700 dark:text-emerald-200">
                         {item.category_name}
                       </span>
                     )}
@@ -167,7 +176,11 @@ export default function MediaDetail() {
                         Imeongezwa: {formatDate(item.created_at)}
                       </span>
                     )}
-                    <span className="flex items-center">
+                    <span
+                      className={`flex items-center ${
+                        isDark ? 'text-gray-300' : 'text-gray-600'
+                      }`}
+                    >
                       <Eye size={14} className="mr-1" />
                       {item.views} mara
                     </span>
@@ -182,7 +195,7 @@ export default function MediaDetail() {
                     <iframe
                       src={`https://www.youtube.com/embed/${youtubeId}`}
                       title={item.title}
-                      className="w-full h-full rounded-lg"
+                      className="w-full h-full rounded-xl"
                       allowFullScreen
                     />
                   </div>
@@ -191,7 +204,7 @@ export default function MediaDetail() {
                 {isVideo && !youtubeId && item.url && (
                   <p
                     className={
-                      isDark ? 'text-gray-300' : 'text-gray-600'
+                      isDark ? 'text-gray-300' : 'text-gray-700'
                     }
                   >
                     Hii ni video. Fungua kupitia link hii:{' '}
@@ -199,7 +212,7 @@ export default function MediaDetail() {
                       href={item.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-purple-600 underline"
+                      className="text-sky-600 underline"
                     >
                       Tazama Video
                     </a>
@@ -208,11 +221,7 @@ export default function MediaDetail() {
 
                 {isAudio && item.file && (
                   <div className="mb-4">
-                    <audio
-                      controls
-                      src={item.file}
-                      className="w-full"
-                    />
+                    <audio controls src={item.file} className="w-full" />
                   </div>
                 )}
 
@@ -220,7 +229,7 @@ export default function MediaDetail() {
                   <img
                     src={item.file || item.thumbnail}
                     alt={item.title}
-                    className="w-full max-h-[480px] object-contain rounded-lg mb-4"
+                    className="w-full max-h-[480px] object-contain rounded-xl mb-4"
                   />
                 )}
 
@@ -229,7 +238,7 @@ export default function MediaDetail() {
                     <iframe
                       src={item.file}
                       title={item.title}
-                      className="w-full h-[480px] rounded-lg"
+                      className="w-full h-[480px] rounded-xl"
                     />
                   </div>
                 )}
@@ -238,7 +247,7 @@ export default function MediaDetail() {
               {/* Description */}
               {item.description && (
                 <p
-                  className={`text-base mb-4 ${
+                  className={`text-sm md:text-base mb-4 ${
                     isDark ? 'text-gray-200' : 'text-gray-700'
                   }`}
                 >
@@ -251,13 +260,13 @@ export default function MediaDetail() {
                 <div className="mt-4">
                   <h3
                     className={`text-sm font-semibold mb-2 ${
-                      isDark ? 'text-white' : 'text-gray-800'
+                      isDark ? 'text-white' : 'text-gray-900'
                     }`}
                   >
                     Vitambulisho:
                   </h3>
                   <p
-                    className={`text-xs ${
+                    className={`text-[12px] md:text-xs ${
                       isDark ? 'text-gray-300' : 'text-gray-600'
                     }`}
                   >
@@ -272,7 +281,7 @@ export default function MediaDetail() {
                   <a
                     href={item.file}
                     download
-                    className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+                    className="inline-flex items-center bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-full text-xs md:text-sm font-semibold transition-colors"
                   >
                     <Download size={16} className="mr-2" />
                     Pakua Faili
@@ -284,7 +293,7 @@ export default function MediaDetail() {
                     href={item.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+                    className="inline-flex items-center bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-full text-xs md:text-sm font-semibold transition-colors"
                   >
                     Fungua Link
                   </a>
@@ -294,20 +303,22 @@ export default function MediaDetail() {
           </div>
 
           {/* Sidebar */}
-          <aside className="lg:col-span-1 space-y-6">
+          <aside className="lg:col-span-1">
             <div
-              className={`card p-6 ${
-                isDark ? 'bg-gray-800' : 'bg-white'
+              className={`rounded-2xl border p-5 md:p-6 ${
+                isDark
+                  ? 'bg-gray-900/85 border-gray-800'
+                  : 'bg-white/95 border-gray-100'
               }`}
             >
               <h3
-                className={`text-lg font-bold mb-4 ${
-                  isDark ? 'text-white' : 'text-gray-800'
+                className={`text-sm md:text-base font-bold mb-4 ${
+                  isDark ? 'text-white' : 'text-gray-900'
                 }`}
               >
                 Maelezo ya Media
               </h3>
-              <div className="space-y-2 text-sm">
+              <div className="space-y-3 text-[12px] md:text-xs">
                 <div>
                   <span
                     className={`font-medium ${
@@ -317,9 +328,7 @@ export default function MediaDetail() {
                     Aina:
                   </span>
                   <p
-                    className={
-                      isDark ? 'text-white' : 'text-gray-800'
-                    }
+                    className={isDark ? 'text-gray-100' : 'text-gray-800'}
                   >
                     {item.media_type}
                   </p>
@@ -335,7 +344,7 @@ export default function MediaDetail() {
                     </span>
                     <p
                       className={
-                        isDark ? 'text-white' : 'text-gray-800'
+                        isDark ? 'text-gray-100' : 'text-gray-800'
                       }
                     >
                       {item.category_name}
@@ -353,7 +362,7 @@ export default function MediaDetail() {
                     </span>
                     <p
                       className={
-                        isDark ? 'text-white' : 'text-gray-800'
+                        isDark ? 'text-gray-100' : 'text-gray-800'
                       }
                     >
                       {formatDate(item.created_at)}
@@ -371,7 +380,7 @@ export default function MediaDetail() {
                     </span>
                     <p
                       className={
-                        isDark ? 'text-white' : 'text-gray-800'
+                        isDark ? 'text-gray-100' : 'text-gray-800'
                       }
                     >
                       {formatDate(item.updated_at)}
@@ -388,7 +397,7 @@ export default function MediaDetail() {
                   </span>
                   <p
                     className={
-                      isDark ? 'text-white' : 'text-gray-800'
+                      isDark ? 'text-gray-100' : 'text-gray-800'
                     }
                   >
                     {item.views} mara
