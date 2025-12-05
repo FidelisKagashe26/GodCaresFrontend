@@ -1,3 +1,4 @@
+// src/components/Carousel.jsx
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -6,12 +7,16 @@ export default function Carousel({ slides, interval = 5000 }) {
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
+    if (!slides || slides.length === 0) return;
+
     const timer = setInterval(
       () => setCurrent((prev) => (prev + 1) % slides.length),
       interval
     );
     return () => clearInterval(timer);
-  }, [slides.length, interval]);
+  }, [slides, interval]);
+
+  if (!slides || slides.length === 0) return null;
 
   const prevSlide = () =>
     setCurrent((prev) => (prev - 1 + slides.length) % slides.length);

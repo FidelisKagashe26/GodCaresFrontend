@@ -1,4 +1,5 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+// src/services/api.js
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 class ApiService {
   constructor() {
@@ -6,31 +7,52 @@ class ApiService {
   }
 
   async request(endpoint, options = {}) {
-    // Clean up endpoint by removing undefined parameters
+    // Clean up endpoint by removing undefined parameters from query string
     let cleanEndpoint = endpoint;
     if (cleanEndpoint.includes('undefined')) {
-      // Remove parameters with undefined values
       cleanEndpoint = cleanEndpoint.replace(/[?&]([^=]+)=undefined/g, '');
-      // Clean up any remaining malformed query strings
       cleanEndpoint = cleanEndpoint.replace(/[?&]$/, '').replace(/[?]&/, '?');
     }
-    
-    const url = `${this.baseURL}${endpoint}`;
+
+    const url = `${this.baseURL}${cleanEndpoint}`;
+
+    // Auto-attach JWT access token if available
+    const token = localStorage.getItem('access');
+
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(options.headers || {}),
+    };
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const config = {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
       ...options,
+      headers,
     };
 
     try {
       const response = await fetch(url, config);
-      
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        let message = `HTTP error! status: ${response.status}`;
+        try {
+          const body = await response.json();
+          if (body && body.detail) {
+            message = body.detail;
+          }
+        } catch (e) {
+          // ignore JSON parse error
+        }
+        throw new Error(message);
       }
-      
+
+      if (response.status === 204) {
+        return null;
+      }
+
       return await response.json();
     } catch (error) {
       console.error('API request failed:', error);
@@ -38,18 +60,83 @@ class ApiService {
     }
   }
 
-  // Categories
+  // ========= AUTH (JWT) =========
+
+  async login(credentials) {
+    // => /api/v1/auth/token/
+    return this.request('/v1/auth/token/', {
+      method: 'POST',
+      body: JSON.stringify(credentials),
+    });
+  }
+
+  async refreshToken(refreshToken) {
+    return this.request('/v1/auth/token/refresh/', {
+      method: 'POST',
+      body: JSON.stringify({ refresh: refreshToken }),
+    });
+  }
+
+  async verifyToken(token) {
+    return this.request('/v1/auth/token/verify/', {
+      method: 'POST',
+      body: JSON.stringify({ token }),
+    });
+  }
+
+  // ========= USER / PROFILE =========
+
+  async registerUser(data) {
+    // badilisha path hii ikibidi mfano: '/v1/users/register/'
+    return this.request('/v1/auth/register/', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async getProfile() {
+    // badilisha path hii kulingana na backend yako
+    return this.request('/v1/users/me/');
+  }
+
+  async updateProfile(data) {
+    return this.request('/v1/users/me/', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async changePassword(data) {
+    // kawaida: { old_password, new_password }
+    return this.request('/v1/auth/password/change/', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async getNotifications(params = {}) {
+    const cleanParams = Object.entries(params).reduce((acc, [key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        acc[key] = value;
+      }
+      return acc;
+    }, {});
+    const queryString = new URLSearchParams(cleanParams).toString();
+    // => /api/v1/notifications/
+    return this.request(`/v1/notifications/${queryString ? `?${queryString}` : ''}`);
+  }
+
+  // ========= CATEGORIES =========
   async getCategories() {
-    return this.request('/categories/');
+    return this.request('/v1/categories/');
   }
 
   async getCategory(slug) {
-    return this.request(`/categories/${slug}/`);
+    return this.request(`/v1/categories/${slug}/`);
   }
 
-  // Posts
+  // ========= POSTS =========
   async getPosts(params = {}) {
-    // Filter out undefined values
     const cleanParams = Object.entries(params).reduce((acc, [key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
         acc[key] = value;
@@ -57,29 +144,28 @@ class ApiService {
       return acc;
     }, {});
     const queryString = new URLSearchParams(cleanParams).toString();
-    return this.request(`/posts/${queryString ? `?${queryString}` : ''}`);
+    return this.request(`/v1/posts/${queryString ? `?${queryString}` : ''}`);
   }
 
   async getPost(slug) {
-    return this.request(`/posts/${slug}/`);
+    return this.request(`/v1/posts/${slug}/`);
   }
 
   async getFeaturedPosts() {
-    return this.request('/posts/featured/');
+    return this.request('/v1/posts/featured/');
   }
 
-  // Seasons
+  // ========= SEASONS =========
   async getSeasons() {
-    return this.request('/seasons/');
+    return this.request('/v1/seasons/');
   }
 
   async getSeason(slug) {
-    return this.request(`/seasons/${slug}/`);
+    return this.request(`/v1/seasons/${slug}/`);
   }
 
-  // Series
+  // ========= SERIES =========
   async getSeries(params = {}) {
-    // Filter out undefined values
     const cleanParams = Object.entries(params).reduce((acc, [key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
         acc[key] = value;
@@ -87,16 +173,15 @@ class ApiService {
       return acc;
     }, {});
     const queryString = new URLSearchParams(cleanParams).toString();
-    return this.request(`/series/${queryString ? `?${queryString}` : ''}`);
+    return this.request(`/v1/series/${queryString ? `?${queryString}` : ''}`);
   }
 
   async getSeriesDetail(slug) {
-    return this.request(`/series/${slug}/`);
+    return this.request(`/v1/series/${slug}/`);
   }
 
-  // Lessons
+  // ========= LESSONS =========
   async getLessons(params = {}) {
-    // Filter out undefined values
     const cleanParams = Object.entries(params).reduce((acc, [key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
         acc[key] = value;
@@ -104,16 +189,15 @@ class ApiService {
       return acc;
     }, {});
     const queryString = new URLSearchParams(cleanParams).toString();
-    return this.request(`/lessons/${queryString ? `?${queryString}` : ''}`);
+    return this.request(`/v1/lessons/${queryString ? `?${queryString}` : ''}`);
   }
 
   async getLesson(slug) {
-    return this.request(`/lessons/${slug}/`);
+    return this.request(`/v1/lessons/${slug}/`);
   }
 
-  // Events
+  // ========= EVENTS =========
   async getEvents(params = {}) {
-    // Filter out undefined values
     const cleanParams = Object.entries(params).reduce((acc, [key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
         acc[key] = value;
@@ -121,24 +205,24 @@ class ApiService {
       return acc;
     }, {});
     const queryString = new URLSearchParams(cleanParams).toString();
-    return this.request(`/events/${queryString ? `?${queryString}` : ''}`);
+    // Hii inalingana na public events API yako: /api/v1/events/
+    return this.request(`/v1/events/${queryString ? `?${queryString}` : ''}`);
   }
 
   async getEvent(slug) {
-    return this.request(`/events/${slug}/`);
+    return this.request(`/v1/events/${slug}/`);
   }
 
   async getUpcomingEvents() {
-    return this.request('/events/upcoming/');
+    return this.request('/v1/events/upcoming/');
   }
 
   async getFeaturedEvents() {
-    return this.request('/events/featured/');
+    return this.request('/v1/events/featured/');
   }
 
-  // Media
+  // ========= MEDIA =========
   async getMediaItems(params = {}) {
-    // Filter out undefined values
     const cleanParams = Object.entries(params).reduce((acc, [key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
         acc[key] = value;
@@ -146,16 +230,16 @@ class ApiService {
       return acc;
     }, {});
     const queryString = new URLSearchParams(cleanParams).toString();
-    return this.request(`/media/${queryString ? `?${queryString}` : ''}`);
+    return this.request(`/v1/media/${queryString ? `?${queryString}` : ''}`);
   }
 
   async getMediaItem(id) {
-    return this.request(`/media/${id}/`);
+    return this.request(`/v1/media/${id}/`);
   }
 
-  // Prayer Requests
+  // ========= PRAYER REQUESTS =========
   async submitPrayerRequest(data) {
-    return this.request('/prayer-requests/', {
+    return this.request('/v1/prayer-requests/', {
       method: 'POST',
       body: JSON.stringify(data),
     });

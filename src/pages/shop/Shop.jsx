@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useTheme } from '../contexts/ThemeContext';
-import LoadingSpinner from '../components/LoadingSpinner';
+import { useTheme } from '../../contexts/ThemeContext';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import { 
   ShoppingCart, 
   Search, 

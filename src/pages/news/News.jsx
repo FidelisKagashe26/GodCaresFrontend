@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useTheme } from '../contexts/ThemeContext';
-import { useApi } from '../hooks/useApi';
-import { formatDate } from '../utils/helpers';
-import SEOHead from '../components/SEOHead';
-import LoadingSpinner from '../components/LoadingSpinner';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useApi } from '../../hooks/useApi';
+import { formatDate } from '../../utils/helpers';
+import SEOHead from '../../components/SEOHead';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import { 
   Newspaper, 
   Search, 

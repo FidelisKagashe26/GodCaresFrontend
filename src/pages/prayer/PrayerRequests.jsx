@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { useTheme } from '../contexts/ThemeContext';
-import { isValidEmail, isValidPhone } from '../utils/helpers';
-import apiService from '../services/api';
-import SEOHead from '../components/SEOHead';
+import { useTheme } from '../../contexts/ThemeContext';
+import { isValidEmail, isValidPhone } from '../../utils/helpers';
+import apiService from '../../services/api';
+import SEOHead from '../../components/SEOHead';
 import { Heart, Send, CheckCircle, Users, Clock, Shield } from 'lucide-react';
 
 export default function PrayerRequests() {

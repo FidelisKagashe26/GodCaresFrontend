@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useTheme } from '../contexts/ThemeContext';
-import LoadingSpinner from '../components/LoadingSpinner';
+import { useTheme } from '../../contexts/ThemeContext';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import { 
   BookOpen, 
   Play, 
@@ -10,7 +10,6 @@ import {
   ArrowLeft, 
   Clock, 
   Eye,
-  Calendar,
   Share2
 } from 'lucide-react';
 

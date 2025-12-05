@@ -1,8 +1,11 @@
-import { useLanguage } from '../contexts/LanguageContext';
-import { useTheme } from '../contexts/ThemeContext';
-import { useApi } from '../hooks/useApi';
-import SEOHead from '../components/SEOHead';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useAuth } from '../../contexts/AuthContext';
+import useApi from '../../hooks/useApi';
+import SEOHead from '../../components/SEOHead';
+import Carousel from '../../components/Carousel';
+
 import {
   BookOpen,
   Heart,
@@ -10,17 +13,62 @@ import {
   Calendar,
   ArrowRight,
   Play,
-  // Download, // unused
-  Star
+  Star,
 } from 'lucide-react';
 
 export default function Home() {
   const { t } = useLanguage();
   const { isDark } = useTheme();
+  const { isAuthenticated } = useAuth();
 
-  // Fetch featured content (currently not rendered here, but fine)
-  const { data: featuredPosts, loading: postsLoading } = useApi('featured-posts');
-  const { data: upcomingEvents, loading: eventsLoading } = useApi('upcoming-events');
+  const { data: featuredPosts, loading: postsLoading } =
+    useApi('featured-posts');
+  const { data: upcomingEvents, loading: eventsLoading } =
+    useApi('upcoming-events');
+
+  const slides = [
+    {
+      image: '/images/picture1.jpg', // badilisha picha zako hapa
+      title: 'Karibu GOD CARES 365',
+      subtitle:
+        'Tovuti ya kiroho yenye masomo ya Biblia, maombi, na rasilimali za imani.',
+      align: 'left',
+      badge: 'Imani • Biblia • Maombi',
+      cta: isAuthenticated
+        ? {
+            label: 'Endelea na Mafunzo',
+            link: '/mafunzo',
+          }
+        : {
+            label: 'Anza Safari ya Imani',
+            link: '/login',
+          },
+    },
+    {
+      image: '/images/picture2.jpg',
+      title: 'Omba Nasi',
+      subtitle:
+        'Tuma maombi yako na tukusindikize katika kusali na kukuombea.',
+      align: 'right',
+      badge: 'Maombi • Msaada • Faraja',
+      cta: {
+        label: 'Tuma Ombi la Maombi',
+        link: '/maombi',
+      },
+    },
+    {
+      image: '/images/picture3.jpg',
+      title: 'Jiunge na Matukio Yetu',
+      subtitle:
+        'Hudhuria semina, ibada, na matukio maalum ya kujengewa kiroho.',
+      align: 'left',
+      badge: 'Matukio • Ushirika',
+      cta: {
+        label: 'Angalia Matukio',
+        link: '/matukio',
+      },
+    },
+  ];
 
   return (
     <>
@@ -30,50 +78,35 @@ export default function Home() {
         keywords="kiroho, biblia, maombi, imani, tanzania, masomo, habari"
         structuredData={{
           name: 'GOD CARES 365',
-          description: 'Tovuti ya kiroho yenye masomo ya Biblia, maombi, na rasilimali za imani',
+          description:
+            'Tovuti ya kiroho yenye masomo ya Biblia, maombi, na rasilimali za imani',
           url: window.location.origin,
           logo: `${window.location.origin}/logo.png`,
           contactPoint: {
             '@type': 'ContactPoint',
             telephone: '+255767525234',
             contactType: 'customer service',
-            email: 'fmklink@gmail.com'
-          }
+            email: 'fmklink@gmail.com',
+          },
         }}
       />
 
-      <div className={`min-h-screen transition-colors ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
-        {/* Hero Section */}
-        <section className="relative bg-gradient-to-r from-green-600 to-blue-600 text-white py-20">
-          <div className="absolute inset-0 bg-black opacity-20" />
-          <div className="relative container mx-auto px-6 text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">Karibu GOD CARES 365</h1>
-            <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
-              Tovuti ya kiroho yenye masomo ya Biblia, maombi, na rasilimali za imani
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to="/mafunzo"
-                className="bg-white text-green-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center"
-              >
-                <BookOpen className="mr-2" size={20} />
-                Anza Kusoma
-              </Link>
-              <Link
-                to="/maombi"
-                className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-green-600 transition-colors flex items-center justify-center"
-              >
-                <Heart className="mr-2" size={20} />
-                Omba Nasi
-              </Link>
-            </div>
-          </div>
-        </section>
+      <div
+        className={`min-h-screen transition-colors ${
+          isDark ? 'bg-gray-900' : 'bg-gray-50'
+        }`}
+      >
+        {/* HERO SLIDER */}
+        <Carousel slides={slides} />
 
         {/* Features Section */}
         <section className="py-16">
           <div className="container mx-auto px-6">
-            <h2 className={`text-3xl font-bold text-center mb-12 ${isDark ? 'text-white' : 'text-gray-800'}`}>
+            <h2
+              className={`text-3xl font-bold text-center mb-12 ${
+                isDark ? 'text-white' : 'text-gray-800'
+              }`}
+            >
               Chagua Kituo
             </h2>
 
@@ -88,11 +121,20 @@ export default function Home() {
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-green-200 transition-colors">
                   <BookOpen className="text-green-600" size={32} />
                 </div>
-                <h3 className={`text-xl font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-800'}`}>
+                <h3
+                  className={`text-xl font-semibold mb-2 ${
+                    isDark ? 'text-white' : 'text-gray-800'
+                  }`}
+                >
                   Masomo ya Biblia
                 </h3>
-                <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'} mb-4`}>
-                  Pata masomo ya kina ya Biblia yaliyopangwa kwa misimu na mfululizo
+                <p
+                  className={`${
+                    isDark ? 'text-gray-300' : 'text-gray-600'
+                  } mb-4`}
+                >
+                  Pata masomo ya kina ya Biblia yaliyopangwa kwa misimu na
+                  mfululizo.
                 </p>
                 <div className="flex items-center justify-center text-green-600 group-hover:text-green-700">
                   <span className="mr-2">Jifunze Zaidi</span>
@@ -110,9 +152,19 @@ export default function Home() {
                 <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-red-200 transition-colors">
                   <Heart className="text-red-600" size={32} />
                 </div>
-                <h3 className={`text-xl font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-800'}`}>Maombi</h3>
-                <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'} mb-4`}>
-                  Tuma maombi yako na tuombe pamoja kama jamii ya imani
+                <h3
+                  className={`text-xl font-semibold mb-2 ${
+                    isDark ? 'text-white' : 'text-gray-800'
+                  }`}
+                >
+                  Maombi
+                </h3>
+                <p
+                  className={`${
+                    isDark ? 'text-gray-300' : 'text-gray-600'
+                  } mb-4`}
+                >
+                  Tuma maombi yako na tuombe pamoja kama jamii ya imani.
                 </p>
                 <div className="flex items-center justify-center text-red-600 group-hover:text-red-700">
                   <span className="mr-2">Omba Nasi</span>
@@ -130,11 +182,19 @@ export default function Home() {
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-200 transition-colors">
                   <Users className="text-blue-600" size={32} />
                 </div>
-                <h3 className={`text-xl font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-800'}`}>
+                <h3
+                  className={`text-xl font-semibold mb-2 ${
+                    isDark ? 'text-white' : 'text-gray-800'
+                  }`}
+                >
                   Habari & Vipengele
                 </h3>
-                <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'} mb-4`}>
-                  Soma makala za kiroho na habari za jamii yetu
+                <p
+                  className={`${
+                    isDark ? 'text-gray-300' : 'text-gray-600'
+                  } mb-4`}
+                >
+                  Soma makala za kiroho na habari za jamii yetu.
                 </p>
                 <div className="flex items-center justify-center text-blue-600 group-hover:text-blue-700">
                   <span className="mr-2">Soma Habari</span>
@@ -152,11 +212,19 @@ export default function Home() {
                 <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-200 transition-colors">
                   <Calendar className="text-purple-600" size={32} />
                 </div>
-                <h3 className={`text-xl font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-800'}`}>
+                <h3
+                  className={`text-xl font-semibold mb-2 ${
+                    isDark ? 'text-white' : 'text-gray-800'
+                  }`}
+                >
                   Matukio Maalum
                 </h3>
-                <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'} mb-4`}>
-                  Angalia matukio yetu ya siku zijazo na jiunge nasi
+                <p
+                  className={`${
+                    isDark ? 'text-gray-300' : 'text-gray-600'
+                  } mb-4`}
+                >
+                  Angalia matukio yetu ya siku zijazo na jiunge nasi.
                 </p>
                 <div className="flex items-center justify-center text-purple-600 group-hover:text-purple-700">
                   <span className="mr-2">Angalia Matukio</span>
@@ -174,11 +242,19 @@ export default function Home() {
                 <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-yellow-200 transition-colors">
                   <Play className="text-yellow-600" size={32} />
                 </div>
-                <h3 className={`text-xl font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-800'}`}>
+                <h3
+                  className={`text-xl font-semibold mb-2 ${
+                    isDark ? 'text-white' : 'text-gray-800'
+                  }`}
+                >
                   Maktaba ya Media
                 </h3>
-                <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'} mb-4`}>
-                  Tazama video, sikia audio, na pakua rasilimali za kiroho
+                <p
+                  className={`${
+                    isDark ? 'text-gray-300' : 'text-gray-600'
+                  } mb-4`}
+                >
+                  Tazama video, sikia audio, na pakua rasilimali za kiroho.
                 </p>
                 <div className="flex items-center justify-center text-yellow-600 group-hover:text-yellow-700">
                   <span className="mr-2">Angalia Media</span>
@@ -196,11 +272,19 @@ export default function Home() {
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-green-200 transition-colors">
                   <Star className="text-green-600" size={32} />
                 </div>
-                <h3 className={`text-xl font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-800'}`}>
+                <h3
+                  className={`text-xl font-semibold mb-2 ${
+                    isDark ? 'text-white' : 'text-gray-800'
+                  }`}
+                >
                   Michango
                 </h3>
-                <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'} mb-4`}>
-                  Changia katika kazi ya Mungu na usaidie jamii yetu
+                <p
+                  className={`${
+                    isDark ? 'text-gray-300' : 'text-gray-600'
+                  } mb-4`}
+                >
+                  Changia katika kazi ya Mungu na usaidie jamii yetu.
                 </p>
                 <div className="flex items-center justify-center text-green-600 group-hover:text-green-700">
                   <span className="mr-2">Changia Sasa</span>
@@ -215,27 +299,44 @@ export default function Home() {
         <section className="py-16 bg-gradient-to-r from-green-600 to-blue-600 text-white">
           <div className="container mx-auto px-6 text-center">
             <blockquote className="text-2xl md:text-3xl font-bold mb-4 max-w-4xl mx-auto">
-              "Hili ndilo pendo, si kwamba sisi tulimpenda Mungu, bali kwamba yeye alitupenda sisi, akamtuma Mwanawe kuwa kipatanisho kwa dhambi zetu"
+              "Hili ndilo pendo, si kwamba sisi tulimpenda Mungu, bali kwamba
+              yeye alitupenda sisi, akamtuma Mwanawe kuwa kipatanisho kwa
+              dhambi zetu"
             </blockquote>
             <cite className="text-xl">– 1 Yohana 4:10</cite>
           </div>
         </section>
 
         {/* Newsletter Section */}
-        <section className={`py-16 ${isDark ? 'bg-gray-800' : 'bg-yellow-50'}`}>
+        <section
+          className={`py-16 ${
+            isDark ? 'bg-gray-808' : 'bg-yellow-50'
+          }`.replace('808', '800')}
+        >
           <div className="container mx-auto px-6 text-center">
-            <h2 className={`text-3xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-800'}`}>
+            <h2
+              className={`text-3xl font-bold mb-4 ${
+                isDark ? 'text-white' : 'text-gray-800'
+              }`}
+            >
               Jiunge na Jarida letu la Maombi
             </h2>
-            <p className={`text-lg mb-8 max-w-2xl mx-auto ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-              Pata ujumbe wa kila wiki, maombi maalum, na rasilimali mpya moja kwa moja kwenye barua pepe yako
+            <p
+              className={`text-lg mb-8 max-w-2xl mx-auto ${
+                isDark ? 'text-gray-300' : 'text-gray-600'
+              }`}
+            >
+              Pata ujumbe wa kila wiki, maombi maalum, na rasilimali mpya moja
+              kwa moja kwenye barua pepe yako.
             </p>
             <form className="max-w-md mx-auto flex">
               <input
                 type="email"
                 placeholder="Barua Pepe Yako"
                 className={`flex-1 px-4 py-3 rounded-l-lg border focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                  isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'
+                  isDark
+                    ? 'bg-gray-700 border-gray-600 text-white'
+                    : 'bg-white border-gray-300 text-gray-900'
                 }`}
               />
               <button
