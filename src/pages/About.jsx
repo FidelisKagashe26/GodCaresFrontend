@@ -1,203 +1,381 @@
 import { useTheme } from '../contexts/ThemeContext';
-import { Info, Users, Heart, Target, Mail, Phone, MapPin } from 'lucide-react';
+import SEOHead from '../components/SEOHead';
+import {
+  Info,
+  Users,
+  Heart,
+  Target,
+  Mail,
+  Phone,
+  MapPin,
+} from 'lucide-react';
 
 export default function About() {
   const { isDark } = useTheme();
 
   return (
-    <div className={`min-h-screen py-12 transition-colors ${
-      isDark ? 'bg-gray-900' : 'bg-gray-50'
-    }`}>
-      <div className="container mx-auto px-6">
-        {/* Header */}
-        <header className="text-center mb-12">
-          <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Info className="text-white" size={32} />
-          </div>
-          <h1 className={`text-4xl font-bold mb-4 ${
-            isDark ? 'text-white' : 'text-gray-800'
-          }`}>Kuhusu Sisi</h1>
-          <p className={`text-lg max-w-2xl mx-auto ${
-            isDark ? 'text-gray-300' : 'text-gray-600'
-          }`}>
-            Jifunze zaidi kuhusu historia, dhamira, na timu ya GOD CARES 365
-          </p>
-        </header>
-
-        {/* Mission & Vision */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-          <div className={`card p-8 ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-              <Target className="text-green-600" size={24} />
+    <>
+      <SEOHead
+        title="Kuhusu Sisi | God Cares 365"
+        description="Jifunze kuhusu historia, dhamira na maono ya God Cares 365 – jukwaa la masomo ya Biblia, maombi na habari za kiroho."
+        keywords="kuhusu sisi, God Cares 365, historia, dhamira, maono"
+      />
+      <div
+        className={`min-h-screen py-10 md:py-12 transition-colors ${
+          isDark
+            ? 'bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950'
+            : 'bg-gradient-to-b from-slate-50 via-white to-emerald-50'
+        }`}
+      >
+        <div className="container mx-auto px-4 md:px-6">
+          {/* Header */}
+          <header className="text-center mb-10 md:mb-12">
+            <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 via-green-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md shadow-emerald-500/40">
+              <Info className="text-white" size={32} />
             </div>
-            <h2 className={`text-2xl font-bold mb-4 ${
-              isDark ? 'text-white' : 'text-gray-800'
-            }`}>Dhamira Yetu</h2>
-            <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}>
-              Kupitia GOD CARES 365, tunalenga kueneza Upendo wa Mungu na Habari Njema kwa kila mtu. 
-              Tunataka kutoa mafunzo ya Biblia yaliyojengwa kwa ufasaha, habari zenye kukutia moyo, 
-              na rasilimali za kiroho ambazo zitawasaidia watu kujenga imani yao na kupata matumaini 
-              katika magumu wanayopitia.
+            <p className="inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-300 mb-3">
+              Who We Are
             </p>
-          </div>
-
-          <div className={`card p-8 ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-              <Heart className="text-blue-600" size={24} />
-            </div>
-            <h2 className={`text-2xl font-bold mb-4 ${
-              isDark ? 'text-white' : 'text-gray-800'
-            }`}>Maono Yetu</h2>
-            <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}>
-              Maono yetu ni kuona jamii ya waumini ikinyanyuka katika umoja wa kiroho, ikisaidia 
-              watu kupata neema na uponyaji wa kiroho. Tunataka kuwa kitovu kinachoaminika kupitia 
-              mitandao yote, ambapo kila mtu, popote alipo, anaweza kupata neno la Mungu, ushauri, 
-              na msaada wa kiroho.
+            <h1
+              className={`text-2xl md:text-4xl font-extrabold mb-3 ${
+                isDark ? 'text-white' : 'text-gray-900'
+              }`}
+            >
+              Kuhusu GOD CARES 365
+            </h1>
+            <p
+              className={`text-sm md:text-lg max-w-2xl mx-auto ${
+                isDark ? 'text-gray-300' : 'text-gray-600'
+              }`}
+            >
+              Jifunze zaidi kuhusu historia, dhamira na maono ya jukwaa hili la
+              kiroho linalolenga kufikia kila mlango, kila nafsi, kila siku.
             </p>
-          </div>
-        </section>
+          </header>
 
-        {/* History */}
-        <section className={`card p-8 mb-16 ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
-          <h2 className={`text-2xl font-bold mb-6 ${
-            isDark ? 'text-white' : 'text-gray-800'
-          }`}>Historia Yetu</h2>
-          <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'} leading-relaxed mb-4`}>
-            GOD CARES 365 ilianzishwa mnamo mwaka 2023 na kundi la vijana wapenzi wa mafundisho ya 
-            Biblia. Ilikusudiwa kuwa na tovuti yenye kutoa habari na rasilimali za kiroho kila siku, 
-            ili waweze kupata faraja, nguvu, na mafunzo yatakayowaimarisha katika mwendo wao na Mungu.
-          </p>
-          <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}>
-            Tulianza kama kikundi kidogo cha waumini wanayosoma pamoja, na sasa tumekuwa jukwaa 
-            lenye watazamaji wengi kutoka sehemu mbalimbali za dunia. Kila siku, tunajitahidi kutoa 
-            maudhui ya hali ya juu yanayojenga imani na kuimarisha uhusiano wa kibinafsi na Mungu.
-          </p>
-        </section>
-
-        {/* Team */}
-        <section className="mb-16">
-          <h2 className={`text-2xl font-bold text-center mb-8 ${
-            isDark ? 'text-white' : 'text-gray-800'
-          }`}>
-            <Users className="inline mr-2" size={24} />
-            Timu Yetu
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className={`card p-6 text-center ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
-              <div className="w-24 h-24 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-white font-bold text-2xl">FV</span>
-              </div>
-              <h3 className={`text-xl font-semibold mb-2 ${
-                isDark ? 'text-white' : 'text-gray-800'
-              }`}>Fidelis Y. Vitabu</h3>
-              <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'} mb-2`}>
-                Mwanzilishi & Muongoza Masomo ya Biblia
-              </p>
-              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                Mwongozi wa kiroho mwenye uzoefu wa miaka mingi katika mafundisho ya Biblia
-              </p>
-            </div>
-
-            <div className={`card p-6 text-center ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
-              <div className="w-24 h-24 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-white font-bold text-2xl">AS</span>
-              </div>
-              <h3 className={`text-xl font-semibold mb-2 ${
-                isDark ? 'text-white' : 'text-gray-800'
-              }`}>Anna M. Simba</h3>
-              <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'} mb-2`}>
-                Mhariri Mkuu wa Habari & Vipengele
-              </p>
-              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                Mhariri mwenye ujuzi wa kuandika makala za kiroho zenye kuvutia
-              </p>
-            </div>
-
-            <div className={`card p-6 text-center ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
-              <div className="w-24 h-24 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-white font-bold text-2xl">ZM</span>
-              </div>
-              <h3 className={`text-xl font-semibold mb-2 ${
-                isDark ? 'text-white' : 'text-gray-800'
-              }`}>Zawadi A. Mwinyi</h3>
-              <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'} mb-2`}>
-                Mratibu wa Mitandao ya Kijamii
-              </p>
-              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                Mtaalamu wa mitandao ya kijamii na mawasiliano ya kidijitali
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Contact */}
-        <section className={`card p-8 ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
-          <h2 className={`text-2xl font-bold mb-6 ${
-            isDark ? 'text-white' : 'text-gray-800'
-          }`}>Wasiliana Nasi</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <Mail className="text-green-600" size={20} />
-                  <span className={isDark ? 'text-gray-300' : 'text-gray-600'}>
-                    fmklink@gmail.com
-                  </span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Phone className="text-green-600" size={20} />
-                  <span className={isDark ? 'text-gray-300' : 'text-gray-600'}>
-                    +255 767 525 234
-                  </span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <MapPin className="text-green-600" size={20} />
-                  <span className={isDark ? 'text-gray-300' : 'text-gray-600'}>
-                    Dar es Salaam, Tanzania
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div>
-              <form className="space-y-4">
-                <input
-                  type="text"
-                  placeholder="Jina Lako"
-                  className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                    isDark 
-                      ? 'bg-gray-700 border-gray-600 text-white' 
-                      : 'bg-white border-gray-300 text-gray-900'
-                  }`}
+          {/* Mission & Vision */}
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-10 md:mb-16">
+            <div
+              className={`card rounded-2xl p-6 md:p-8 shadow-md ${
+                isDark
+                  ? 'bg-gray-900/80 border border-gray-800'
+                  : 'bg-white border border-emerald-50'
+              }`}
+            >
+              <div className="w-12 h-12 bg-gradient-to-br from-emerald-500/15 to-blue-500/15 border border-emerald-500/30 rounded-xl flex items-center justify-center mb-4">
+                <Target
+                  className="text-emerald-600 dark:text-emerald-400"
+                  size={24}
                 />
-                <input
-                  type="email"
-                  placeholder="Barua Pepe"
-                  className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                    isDark 
-                      ? 'bg-gray-700 border-gray-600 text-white' 
-                      : 'bg-white border-gray-300 text-gray-900'
-                  }`}
+              </div>
+              <h2
+                className={`text-xl md:text-2xl font-bold mb-3 ${
+                  isDark ? 'text-white' : 'text-gray-900'
+                }`}
+              >
+                Dhamira Yetu
+              </h2>
+              <p
+                className={`text-sm md:text-base leading-relaxed ${
+                  isDark ? 'text-gray-300' : 'text-gray-600'
+                }`}
+              >
+                Kupitia GOD CARES 365, tunalenga kueneza Upendo wa Mungu na
+                Habari Njema kwa kila mtu. Tunataka kutoa mafunzo ya Biblia ya
+                kina, habari zenye kukutia moyo, na rasilimali za kiroho
+                zitakazosaidia watu kujenga imani yao, kupata matumaini na
+                kutambua kwamba Mungu anawajali kila siku.
+              </p>
+            </div>
+
+            <div
+              className={`card rounded-2xl p-6 md:p-8 shadow-md ${
+                isDark
+                  ? 'bg-gray-900/80 border border-gray-800'
+                  : 'bg-white border border-emerald-50'
+              }`}
+            >
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500/15 to-emerald-500/15 border border-blue-500/30 rounded-xl flex items-center justify-center mb-4">
+                <Heart
+                  className="text-blue-600 dark:text-blue-400"
+                  size={24}
                 />
-                <textarea
-                  rows="4"
-                  placeholder="Ujumbe Wako"
-                  className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                    isDark 
-                      ? 'bg-gray-700 border-gray-600 text-white' 
-                      : 'bg-white border-gray-300 text-gray-900'
+              </div>
+              <h2
+                className={`text-xl md:text-2xl font-bold mb-3 ${
+                  isDark ? 'text-white' : 'text-gray-900'
+                }`}
+              >
+                Maono Yetu
+              </h2>
+              <p
+                className={`text-sm md:text-base leading-relaxed ${
+                  isDark ? 'text-gray-300' : 'text-gray-600'
+                }`}
+              >
+                Maono yetu ni kuona jamii ya waumini ikinyanyuka katika umoja wa
+                kiroho, ikisaidia watu kupata neema na uponyaji wa kiroho.
+                Tunataka kuwa kitovu kinachoaminika mtandaoni, ambapo kila mtu,
+                popote alipo, anaweza kupata Neno la Mungu, ushauri na msaada wa
+                kiroho kwa namna iliyo rahisi na ya kisasa.
+              </p>
+            </div>
+          </section>
+
+          {/* History */}
+          <section
+            className={`card rounded-2xl p-6 md:p-8 shadow-md mb-10 md:mb-16 ${
+              isDark
+                ? 'bg-gray-900/80 border border-gray-800'
+                : 'bg-white border border-emerald-50'
+            }`}
+          >
+            <h2
+              className={`text-xl md:text-2xl font-bold mb-4 md:mb-6 ${
+                isDark ? 'text-white' : 'text-gray-900'
+              }`}
+            >
+              Historia Yetu
+            </h2>
+            <p
+              className={`text-sm md:text-base leading-relaxed mb-3 md:mb-4 ${
+                isDark ? 'text-gray-300' : 'text-gray-600'
+              }`}
+            >
+              GOD CARES 365 ilianzishwa mnamo mwaka 2023 na kundi la vijana
+              wapenzi wa mafundisho ya Biblia. Kusudi kuu lilikuwa kuanzisha
+              jukwaa la mtandaoni linalotoa habari na rasilimali za kiroho kila
+              siku, ili watu waweze kupata faraja, nguvu na mafunzo
+              yanayoimarisha mwendo wao na Mungu.
+            </p>
+            <p
+              className={`text-sm md:text-base leading-relaxed ${
+                isDark ? 'text-gray-300' : 'text-gray-600'
+              }`}
+            >
+              Tulianza kama kikundi kidogo cha waumini wanaosoma pamoja, na sasa
+              tumeendelea kuwa jukwaa linalofikiwa na watu kutoka maeneo
+              mbalimbali. Kila siku tunajitahidi kutoa maudhui ya hali ya juu
+              yanayojenga imani, kuleta tumaini na kuhamasisha watu kuishi
+              maisha yanayompendeza Mungu.
+            </p>
+          </section>
+
+          {/* Team */}
+          <section className="mb-10 md:mb-16">
+            <h2
+              className={`text-xl md:text-2xl font-bold text-center mb-6 md:mb-8 ${
+                isDark ? 'text-white' : 'text-gray-900'
+              }`}
+            >
+              <Users className="inline mr-2 mb-1" size={22} />
+              Timu Yetu
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+              <div
+                className={`card rounded-2xl p-6 text-center shadow-md ${
+                  isDark
+                    ? 'bg-gray-900/80 border border-gray-800'
+                    : 'bg-white border border-emerald-50'
+                }`}
+              >
+                <div className="w-24 h-24 bg-gradient-to-br from-emerald-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-md shadow-emerald-500/40">
+                  <span className="text-white font-bold text-2xl">FV</span>
+                </div>
+                <h3
+                  className={`text-lg md:text-xl font-semibold mb-1 ${
+                    isDark ? 'text-white' : 'text-gray-900'
                   }`}
-                ></textarea>
-                <button
-                  type="submit"
-                  className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
                 >
-                  Tuma Ujumbe
-                </button>
-              </form>
+                  Fidelis Y. Vitabu
+                </h3>
+                <p
+                  className={`text-xs md:text-sm mb-1 ${
+                    isDark ? 'text-gray-300' : 'text-gray-600'
+                  }`}
+                >
+                  Mwanzilishi &amp; Muongoza Masomo ya Biblia
+                </p>
+                <p
+                  className={`text-xs md:text-sm ${
+                    isDark ? 'text-gray-400' : 'text-gray-500'
+                  }`}
+                >
+                  Mwongozi wa kiroho mwenye uzoefu wa miaka mingi katika
+                  mafundisho ya Biblia na ushauri wa kiroho.
+                </p>
+              </div>
+
+              <div
+                className={`card rounded-2xl p-6 text-center shadow-md ${
+                  isDark
+                    ? 'bg-gray-900/80 border border-gray-800'
+                    : 'bg-white border border-emerald-50'
+                }`}
+              >
+                <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-md shadow-blue-500/40">
+                  <span className="text-white font-bold text-2xl">AS</span>
+                </div>
+                <h3
+                  className={`text-lg md:text-xl font-semibold mb-1 ${
+                    isDark ? 'text-white' : 'text-gray-900'
+                  }`}
+                >
+                  Anna M. Simba
+                </h3>
+                <p
+                  className={`text-xs md:text-sm mb-1 ${
+                    isDark ? 'text-gray-300' : 'text-gray-600'
+                  }`}
+                >
+                  Mhariri Mkuu wa Habari &amp; Vipengele
+                </p>
+                <p
+                  className={`text-xs md:text-sm ${
+                    isDark ? 'text-gray-400' : 'text-gray-500'
+                  }`}
+                >
+                  Mhariri mwenye ujuzi wa kuandika makala za kiroho zenye
+                  kugusa maisha na kuhamasisha mabadiliko chanya.
+                </p>
+              </div>
+
+              <div
+                className={`card rounded-2xl p-6 text-center shadow-md ${
+                  isDark
+                    ? 'bg-gray-900/80 border border-gray-800'
+                    : 'bg-white border border-emerald-50'
+                }`}
+              >
+                <div className="w-24 h-24 bg-gradient-to-br from-yellow-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-md shadow-yellow-400/40">
+                  <span className="text-white font-bold text-2xl">ZM</span>
+                </div>
+                <h3
+                  className={`text-lg md:text-xl font-semibold mb-1 ${
+                    isDark ? 'text-white' : 'text-gray-900'
+                  }`}
+                >
+                  Zawadi A. Mwinyi
+                </h3>
+                <p
+                  className={`text-xs md:text-sm mb-1 ${
+                    isDark ? 'text-gray-300' : 'text-gray-600'
+                  }`}
+                >
+                  Mratibu wa Mitandao ya Kijamii
+                </p>
+                <p
+                  className={`text-xs md:text-sm ${
+                    isDark ? 'text-gray-400' : 'text-gray-500'
+                  }`}
+                >
+                  Mtaalamu wa mawasiliano ya kidijitali, anayeratibu ujumbe
+                  wetu kufika kwa haraka kupitia majukwaa ya mtandaoni.
+                </p>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+
+          {/* Contact */}
+          <section
+            className={`card rounded-2xl p-6 md:p-8 shadow-md ${
+              isDark
+                ? 'bg-gray-900/80 border border-gray-800'
+                : 'bg-white border border-emerald-50'
+            }`}
+          >
+            <h2
+              className={`text-xl md:text-2xl font-bold mb-4 md:mb-6 ${
+                isDark ? 'text-white' : 'text-gray-900'
+              }`}
+            >
+              Wasiliana Nasi
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+              <div>
+                <div className="space-y-4 text-sm">
+                  <div className="flex items-center space-x-3">
+                    <Mail
+                      className="text-emerald-500 dark:text-emerald-400"
+                      size={20}
+                    />
+                    <span
+                      className={
+                        isDark ? 'text-gray-300' : 'text-gray-700'
+                      }
+                    >
+                      fmklink@gmail.com
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <Phone
+                      className="text-emerald-500 dark:text-emerald-400"
+                      size={20}
+                    />
+                    <span
+                      className={
+                        isDark ? 'text-gray-300' : 'text-gray-700'
+                      }
+                    >
+                      +255 767 525 234
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <MapPin
+                      className="text-emerald-500 dark:text-emerald-400"
+                      size={20}
+                    />
+                    <span
+                      className={
+                        isDark ? 'text-gray-300' : 'text-gray-700'
+                      }
+                    >
+                      Dar es Salaam, Tanzania
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <form className="space-y-3 md:space-y-4 text-sm">
+                  <input
+                    type="text"
+                    placeholder="Jina Lako"
+                    className={`w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+                      isDark
+                        ? 'bg-gray-900 border-gray-700 text-white'
+                        : 'bg-white border-gray-300 text-gray-900'
+                    }`}
+                  />
+                  <input
+                    type="email"
+                    placeholder="Barua Pepe"
+                    className={`w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+                      isDark
+                        ? 'bg-gray-900 border-gray-700 text-white'
+                        : 'bg-white border-gray-300 text-gray-900'
+                    }`}
+                  />
+                  <textarea
+                    rows="4"
+                    placeholder="Ujumbe Wako"
+                    className={`w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+                      isDark
+                        ? 'bg-gray-900 border-gray-700 text-white'
+                        : 'bg-white border-gray-300 text-gray-900'
+                    }`}
+                  ></textarea>
+                  <button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-emerald-500 to-blue-600 hover:brightness-110 text-white font-semibold px-6 py-3 rounded-lg transition-colors text-sm shadow-sm shadow-emerald-500/40"
+                  >
+                    Tuma Ujumbe
+                  </button>
+                </form>
+              </div>
+            </div>
+          </section>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

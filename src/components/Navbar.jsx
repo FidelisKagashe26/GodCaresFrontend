@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
+import logo from '../assets/1000472563.png';
 
 import {
   Menu,
@@ -136,24 +137,29 @@ export default function Navbar() {
           {/* Logo */}
           <Link
             to="/"
-            className="flex items-center gap-2"
+            className="flex items-center gap-3"
             onClick={() => {
               closeAllDropdowns();
               setIsOpen(false);
             }}
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-green-500 via-emerald-500 to-blue-600 shadow-sm shadow-emerald-500/40">
-              <span className="text-[11px] font-extrabold tracking-tight text-white">
-                GC
-              </span>
+            {/* Logo image */}
+            <div className="flex h-20 w-auto mb-1 items-center">
+              <img
+                src={logo}
+                alt="God Cares 365 Logo"
+                className="h-20 w-auto object-contain"
+              />
             </div>
+
+            {/* Text & tagline */}
             <div className="flex flex-col leading-tight">
               <span
-                className={`text-[11px] md:text-xs font-semibold uppercase tracking-[0.15em] ${
+                className={`text-[11px] md:text-xs hidden md:block font-semibold uppercase tracking-[0.18em] ${
                   isDark ? 'text-emerald-300' : 'text-emerald-700'
                 }`}
               >
-                God Cares 365
+                GOD CARES 365
               </span>
               <span
                 className={`hidden sm:inline text-[10px] md:text-xs font-medium ${
@@ -164,6 +170,7 @@ export default function Navbar() {
               </span>
             </div>
           </Link>
+
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-2">
@@ -259,13 +266,13 @@ export default function Navbar() {
             ))}
 
             {/* CTA Button */}
-            <Link
+            {/* <Link
               to="/mafunzo"
               onClick={closeAllDropdowns}
               className="ml-1 inline-flex items-center rounded-full bg-gradient-to-r from-emerald-500 to-blue-600 px-3.5 py-1.5 text-[12px] font-semibold text-white shadow-sm shadow-emerald-500/40 hover:brightness-110"
             >
               {language === 'sw' ? 'Jiunge na Safari' : 'Join the Journey'}
-            </Link>
+            </Link> */}
           </div>
 
           {/* Right controls */}
