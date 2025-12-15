@@ -1,69 +1,65 @@
-// src/pages/account/Profile.jsx
-import React, { useEffect, useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import { useTheme } from '../../contexts/ThemeContext';
-import { useAuth } from '../../contexts/AuthContext';
-import SEOHead from '../../components/SEOHead';
-import LoadingSpinner from '../../components/LoadingSpinner';
-import apiService from '../../services/api';
-import {
-  User,
-  Mail,
-  Phone,
-  MapPin,
-  Shield,
-  CalendarDays,
-  AlertCircle,
-  CheckCircle2,
-} from 'lucide-react';
+import React, { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { useTheme } from "../../contexts/ThemeContext";
+import { useLanguage } from "../../contexts/LanguageContext";
+import SEOHead from "../../components/SEOHead";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import api from "../../services/api";
+import { User, Mail, Phone, MapPin, Shield, CalendarDays, AlertCircle, CheckCircle2 } from "lucide-react";
 
 export default function Profile() {
   const { isDark } = useTheme();
-  const { user } = useAuth();
+  const { t, language } = useLanguage();
 
+  const [me, setMe] = useState(null);
   const [form, setForm] = useState({
-    username: '',
-    email: '',
-    first_name: '',
-    last_name: '',
-    phone: '',
-    location: '',
+    username: "",
+    first_name: "",
+    last_name: "",
+    phone: "",
+    location: "",
   });
-  const [rawProfile, setRawProfile] = useState(null);
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const loadProfile = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await apiService.getProfile();
-        setRawProfile(data);
-        setForm({
-          username: data.username || '',
-          email: data.email || '',
-          first_name: data.first_name || '',
-          last_name: data.last_name || '',
-          phone: data.phone || '',
-          location: data.location || '',
-        });
-      } catch (err) {
-        console.error('Profile load error:', err);
-        setError(err.message || 'Imeshindikana kupakia profaili.');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const loadMe = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await api.getMe(); // OpenAPI: GET /api/v1/auth/me/
+      setMe(data);
+      setForm({
+        username: data.username || "",
+        first_name: data.first_name || "",
+        last_name: data.last_name || "",
+        phone: data.phone || "",
+        location: data.location || "",
+      });
+    } catch (err) {
+      setError(err?.message || (language === "sw" ? "Imeshindikana kupakia profaili." : "Failed to load profile."));
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    loadProfile();
-  }, []);
+  useEffect(() => {
+    loadMe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [language]);
+
+  const initials = useMemo(() => {
+    const fn = form.first_name?.trim();
+    const ln = form.last_name?.trim();
+    if (fn || ln) return `${(fn || "")[0] || ""}${(ln || "")[0] || ""}`.toUpperCase();
+    return (form.username || "U").charAt(0).toUpperCase();
+  }, [form]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm((p) => ({ ...p, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -71,72 +67,39 @@ export default function Profile() {
     setSaving(true);
     setError(null);
     setMessage(null);
+
     try {
-      await apiService.updateProfile(form);
-      setMessage('Taarifa za profaili zimehifadhiwa kikamilifu.');
+      // OpenAPI: PATCH /api/v1/auth/me/ accepts ProfileUpdate fields (no email!)
+      const updated = await api.patchMe({
+        username: form.username,
+        first_name: form.first_name,
+        last_name: form.last_name,
+        phone: form.phone,
+        location: form.location,
+      });
+
+      setMe(updated);
+      setMessage(t("profileSaved") || (language === "sw" ? "Taarifa zimehifadhiwa." : "Profile saved."));
     } catch (err) {
-      console.error('Profile update error:', err);
-      setError(err.message || 'Imeshindikana kuhifadhi mabadiliko.');
+      setError(err?.message || (language === "sw" ? "Imeshindikana kuhifadhi." : "Failed to save changes."));
     } finally {
       setSaving(false);
     }
   };
 
   const formatDate = (value) => {
-    if (!value) return '';
+    if (!value) return "";
     const d = new Date(value);
-    if (Number.isNaN(d.getTime())) return '';
-    return d.toLocaleDateString('sw-TZ', {
-      year: 'numeric',
-      month: 'long',
-      day: '2-digit',
-    });
+    if (Number.isNaN(d.getTime())) return "";
+    return d.toLocaleDateString(language === "sw" ? "sw-TZ" : "en-US", { year: "numeric", month: "long", day: "2-digit" });
   };
-
-  const extraFields = useMemo(() => {
-    if (!rawProfile) return [];
-    const known = new Set([
-      'id',
-      'username',
-      'email',
-      'first_name',
-      'last_name',
-      'phone',
-      'location',
-      'date_joined',
-      'last_login',
-      'is_staff',
-      'is_superuser',
-      'is_active',
-    ]);
-    return Object.entries(rawProfile).filter(
-      ([key]) => !known.has(key)
-    );
-  }, [rawProfile]);
-
-  const initials = useMemo(() => {
-    const fn = form.first_name?.trim();
-    const ln = form.last_name?.trim();
-    if (fn || ln) {
-      return `${(fn || '')[0] || ''}${(ln || '')[0] || ''}`.toUpperCase();
-    }
-    const u = form.username || user?.username || user?.email || 'U';
-    return u.charAt(0).toUpperCase();
-  }, [form, user]);
 
   if (loading) {
     return (
       <>
-        <SEOHead
-          title="Profaili Yangu"
-          description="Dhibiti taarifa zako za akaunti"
-        />
-        <section
-          className={`min-h-[calc(100vh-200px)] flex items-center justify-center transition-colors ${
-            isDark ? 'bg-gray-900' : 'bg-gray-50'
-          }`}
-        >
-          <LoadingSpinner text="Inapakia profaili..." />
+        <SEOHead title={t("profileTitle") || (language === "sw" ? "Profaili Yangu" : "My Profile")} description="" />
+        <section className={`min-h-[calc(100vh-200px)] flex items-center justify-center ${isDark ? "bg-gray-900" : "bg-gray-50"}`}>
+          <LoadingSpinner text={t("loadingProfile") || (language === "sw" ? "Inapakia profaili..." : "Loading profile...")} />
         </section>
       </>
     );
@@ -145,56 +108,47 @@ export default function Profile() {
   return (
     <>
       <SEOHead
-        title="Profaili Yangu"
-        description="Dhibiti taarifa zako binafsi na mpangilio wa akaunti katika GOD CARES 365."
+        title={t("profileTitle") || (language === "sw" ? "Profaili Yangu" : "My Profile")}
+        description={t("profileMetaDesc") || (language === "sw" ? "Dhibiti taarifa zako binafsi." : "Manage your profile.")}
       />
 
-      <section
-        className={`min-h-[calc(100vh-200px)] py-10 transition-colors ${
-          isDark ? 'bg-gray-900' : 'bg-gray-50'
-        }`}
-      >
+      <section className={`min-h-[calc(100vh-200px)] py-10 ${isDark ? "bg-gray-900" : "bg-gray-50"}`}>
         <div className="max-w-4xl mx-auto px-4">
-          <div
-            className={`rounded-2xl shadow-lg border p-6 md:p-8 ${
-              isDark
-                ? 'bg-gray-800 border-gray-700'
-                : 'bg-white border-gray-100'
-            }`}
-          >
-            {/* Header */}
+          <div className={`rounded-2xl shadow-lg border p-6 md:p-8 ${isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100"}`}>
             <div className="flex items-start justify-between mb-6 gap-4">
               <div className="flex items-center gap-3">
-                <div className="relative">
-                  <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-green-600 flex items-center justify-center text-white text-lg md:text-xl font-bold">
-                    {initials}
-                  </div>
-                  <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
-                    <User size={12} className="text-white" />
-                  </span>
+                <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-green-600 flex items-center justify-center text-white text-lg md:text-xl font-bold">
+                  {initials}
                 </div>
+
                 <div>
                   <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
-                    Profaili Yangu
+                    {t("profileTitle") || (language === "sw" ? "Profaili Yangu" : "My Profile")}
                   </h1>
                   <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
-                    Dhibiti taarifa zako binafsi na mawasiliano.
+                    {t("profileSubTitle") || (language === "sw" ? "Dhibiti taarifa zako binafsi na mawasiliano." : "Manage your personal info.")}
                   </p>
                 </div>
               </div>
 
               <div className="text-right text-[11px] md:text-xs text-gray-500 dark:text-gray-400">
-                <p>{user?.username || user?.email || 'Mtumiaji'}</p>
-                {rawProfile?.date_joined && (
-                  <p className="flex items-center gap-1 justify-end mt-1">
+                {me?.date_joined && (
+                  <p className="flex items-center gap-1 justify-end">
                     <CalendarDays size={12} />
-                    Umejiunga: {formatDate(rawProfile.date_joined)}
+                    {language === "sw" ? "Umejiunga:" : "Joined:"} {formatDate(me.date_joined)}
+                  </p>
+                )}
+                {typeof me?.email_verified === "boolean" && (
+                  <p className="mt-1">
+                    {language === "sw" ? "Email status:" : "Email status:"}{" "}
+                    <span className={me.email_verified ? "text-emerald-500 font-semibold" : "text-amber-500 font-semibold"}>
+                      {me.email_verified ? (language === "sw" ? "Verified" : "Verified") : (language === "sw" ? "Haijathibitishwa" : "Not verified")}
+                    </span>
                   </p>
                 )}
               </div>
             </div>
 
-            {/* Alerts */}
             {error && (
               <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-500/40 dark:bg-red-900/40 dark:text-red-100 flex items-center gap-2">
                 <AlertCircle size={16} />
@@ -210,12 +164,11 @@ export default function Profile() {
             )}
 
             <div className="grid md:grid-cols-[2fr,1.2fr] gap-8">
-              {/* Form */}
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <label className="block mb-1 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-200">
-                      Jina la kwanza
+                      {language === "sw" ? "Jina la kwanza" : "First name"}
                     </label>
                     <input
                       type="text"
@@ -225,9 +178,10 @@ export default function Profile() {
                       className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
                   </div>
+
                   <div>
                     <label className="block mb-1 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-200">
-                      Jina la mwisho
+                      {language === "sw" ? "Jina la mwisho" : "Last name"}
                     </label>
                     <input
                       type="text"
@@ -241,7 +195,7 @@ export default function Profile() {
 
                 <div>
                   <label className="block mb-1 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-200">
-                    Username
+                    {language === "sw" ? "Username" : "Username"}
                   </label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -257,9 +211,10 @@ export default function Profile() {
                   </div>
                 </div>
 
+                {/* EMAIL: READ-ONLY (OpenAPI haikubali email update kwenye /me/) */}
                 <div>
                   <label className="block mb-1 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-200">
-                    Barua pepe
+                    {language === "sw" ? "Barua pepe" : "Email"}
                   </label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -267,18 +222,24 @@ export default function Profile() {
                     </span>
                     <input
                       type="email"
-                      name="email"
-                      value={form.email}
-                      onChange={handleChange}
-                      className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                      value={me?.email || ""}
+                      readOnly
+                      className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-950 pl-9 pr-3 py-2 text-sm text-gray-700 dark:text-gray-200"
                     />
+                  </div>
+
+                  <div className="mt-2 text-[11px] text-gray-500 dark:text-gray-400">
+                    {language === "sw" ? "Kubadili email tumia: " : "To change email use: "}
+                    <Link to="/profile/email" className="font-semibold text-emerald-600 hover:underline dark:text-emerald-300">
+                      {language === "sw" ? "Badili Email" : "Change Email"}
+                    </Link>
                   </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <label className="block mb-1 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-200">
-                      Namba ya simu
+                      {language === "sw" ? "Namba ya simu" : "Phone"}
                     </label>
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -296,7 +257,7 @@ export default function Profile() {
 
                   <div>
                     <label className="block mb-1 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-200">
-                      Mahali ulipo
+                      {language === "sw" ? "Mahali ulipo" : "Location"}
                     </label>
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -314,12 +275,9 @@ export default function Profile() {
                 </div>
 
                 <div className="flex items-center justify-between pt-4">
-                  <Link
-                    to="/profile/password"
-                    className="text-xs text-green-600 hover:underline flex items-center gap-1"
-                  >
+                  <Link to="/profile/password" className="text-xs text-green-600 hover:underline flex items-center gap-1">
                     <Shield size={12} />
-                    Badili neno la siri
+                    {language === "sw" ? "Badili nenosiri" : "Change password"}
                   </Link>
 
                   <button
@@ -327,81 +285,32 @@ export default function Profile() {
                     disabled={saving}
                     className="px-4 py-2 text-sm font-medium rounded-lg bg-green-600 hover:bg-green-700 text-white disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
                   >
-                    {saving && (
-                      <span className="inline-block h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    )}
-                    {saving ? 'Inahifadhi...' : 'Hifadhi Mabadiliko'}
+                    {saving && <span className="inline-block h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+                    {saving ? (language === "sw" ? "Inahifadhi..." : "Saving...") : (language === "sw" ? "Hifadhi Mabadiliko" : "Save changes")}
                   </button>
                 </div>
               </form>
 
-              {/* Sidebar */}
               <aside className="space-y-4 text-sm">
-                <div
-                  className={`rounded-xl p-4 ${
-                    isDark
-                      ? 'bg-gray-900 border border-gray-700'
-                      : 'bg-gray-50 border border-gray-200'
-                  }`}
-                >
+                <div className={`rounded-xl p-4 ${isDark ? "bg-gray-900 border border-gray-700" : "bg-gray-50 border border-gray-200"}`}>
                   <h2 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm">
-                    Muhtasari wa Akaunti
+                    {language === "sw" ? "Muhtasari wa Akaunti" : "Account summary"}
                   </h2>
+
                   <ul className="space-y-1 text-gray-600 dark:text-gray-300 text-xs">
-                    {rawProfile?.id && (
+                    {me?.id && (
                       <li>
-                        <span className="font-medium">ID:</span>{' '}
-                        {rawProfile.id}
+                        <span className="font-medium">ID:</span> {me.id}
                       </li>
                     )}
-                    {rawProfile?.last_login && (
-                      <li>
-                        <span className="font-medium">
-                          Mara ya mwisho kuingia:
-                        </span>{' '}
-                        {formatDate(rawProfile.last_login)}
-                      </li>
-                    )}
-                    {typeof rawProfile?.is_active === 'boolean' && (
-                      <li>
-                        <span className="font-medium">Status:</span>{' '}
-                        {rawProfile.is_active ? 'Active' : 'Inactive'}
-                      </li>
-                    )}
-                    {typeof rawProfile?.is_staff === 'boolean' && (
-                      <li>
-                        <span className="font-medium">Staff:</span>{' '}
-                        {rawProfile.is_staff ? 'Ndiyo' : 'Hapana'}
-                      </li>
-                    )}
+                    <li>
+                      <span className="font-medium">{language === "sw" ? "Username:" : "Username:"}</span> {me?.username || "-"}
+                    </li>
+                    <li>
+                      <span className="font-medium">{language === "sw" ? "Email:" : "Email:"}</span> {me?.email || "-"}
+                    </li>
                   </ul>
                 </div>
-
-                {extraFields.length > 0 && (
-                  <div
-                    className={`rounded-xl p-4 ${
-                      isDark
-                        ? 'bg-gray-900 border border-gray-700'
-                        : 'bg-gray-50 border border-gray-200'
-                    }`}
-                  >
-                    <h2 className="font-semibold text-gray-900 dark:text-white mb-2 text-xs">
-                      Taarifa Nyingine kutoka API
-                    </h2>
-                    <ul className="space-y-1 text-[11px] text-gray-500 dark:text-gray-400 max-h-40 overflow-auto">
-                      {extraFields.map(([key, value]) => (
-                        <li key={key} className="flex justify-between gap-2">
-                          <span className="font-medium">{key}:</span>
-                          <span className="truncate">
-                            {typeof value === 'object'
-                              ? JSON.stringify(value)
-                              : String(value)}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
               </aside>
             </div>
           </div>

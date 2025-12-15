@@ -1,249 +1,222 @@
-// src/services/api.js
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "https://godcares.pythonanywhere.com").replace(/\/$/, "");
 
-class ApiService {
-  constructor() {
-    this.baseURL = API_BASE_URL;
-  }
+const ACCESS_KEY = "gc365_access";
+const REFRESH_KEY = "gc365_refresh";
 
-  async request(endpoint, options = {}) {
-    // Clean up endpoint by removing undefined parameters from query string
-    let cleanEndpoint = endpoint;
-    if (cleanEndpoint.includes('undefined')) {
-      cleanEndpoint = cleanEndpoint.replace(/[?&]([^=]+)=undefined/g, '');
-      cleanEndpoint = cleanEndpoint.replace(/[?&]$/, '').replace(/[?]&/, '?');
-    }
-
-    const url = `${this.baseURL}${cleanEndpoint}`;
-
-    // Auto-attach JWT access token if available
-    const token = localStorage.getItem('access');
-
-    const headers = {
-      'Content-Type': 'application/json',
-      ...(options.headers || {}),
-    };
-
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    const config = {
-      ...options,
-      headers,
-    };
-
-    try {
-      const response = await fetch(url, config);
-
-      if (!response.ok) {
-        let message = `HTTP error! status: ${response.status}`;
-        try {
-          const body = await response.json();
-          if (body && body.detail) {
-            message = body.detail;
-          }
-        } catch (e) {
-          // ignore JSON parse error
-        }
-        throw new Error(message);
-      }
-
-      if (response.status === 204) {
-        return null;
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('API request failed:', error);
-      throw error;
-    }
-  }
-
-  // ========= AUTH (JWT) =========
-
-  async login(credentials) {
-    // => /api/v1/auth/token/
-    return this.request('/v1/auth/token/', {
-      method: 'POST',
-      body: JSON.stringify(credentials),
-    });
-  }
-
-  async refreshToken(refreshToken) {
-    return this.request('/v1/auth/token/refresh/', {
-      method: 'POST',
-      body: JSON.stringify({ refresh: refreshToken }),
-    });
-  }
-
-  async verifyToken(token) {
-    return this.request('/v1/auth/token/verify/', {
-      method: 'POST',
-      body: JSON.stringify({ token }),
-    });
-  }
-
-  // ========= USER / PROFILE =========
-
-  async registerUser(data) {
-    // badilisha path hii ikibidi mfano: '/v1/users/register/'
-    return this.request('/v1/auth/register/', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  }
-
-  async getProfile() {
-    // badilisha path hii kulingana na backend yako
-    return this.request('/v1/users/me/');
-  }
-
-  async updateProfile(data) {
-    return this.request('/v1/users/me/', {
-      method: 'PATCH',
-      body: JSON.stringify(data),
-    });
-  }
-
-  async changePassword(data) {
-    // kawaida: { old_password, new_password }
-    return this.request('/v1/auth/password/change/', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  }
-
-  async getNotifications(params = {}) {
-    const cleanParams = Object.entries(params).reduce((acc, [key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        acc[key] = value;
-      }
-      return acc;
-    }, {});
-    const queryString = new URLSearchParams(cleanParams).toString();
-    // => /api/v1/notifications/
-    return this.request(`/v1/notifications/${queryString ? `?${queryString}` : ''}`);
-  }
-
-  // ========= CATEGORIES =========
-  async getCategories() {
-    return this.request('/v1/categories/');
-  }
-
-  async getCategory(slug) {
-    return this.request(`/v1/categories/${slug}/`);
-  }
-
-  // ========= POSTS =========
-  async getPosts(params = {}) {
-    const cleanParams = Object.entries(params).reduce((acc, [key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        acc[key] = value;
-      }
-      return acc;
-    }, {});
-    const queryString = new URLSearchParams(cleanParams).toString();
-    return this.request(`/v1/posts/${queryString ? `?${queryString}` : ''}`);
-  }
-
-  async getPost(slug) {
-    return this.request(`/v1/posts/${slug}/`);
-  }
-
-  async getFeaturedPosts() {
-    return this.request('/v1/posts/featured/');
-  }
-
-  // ========= SEASONS =========
-  async getSeasons() {
-    return this.request('/v1/seasons/');
-  }
-
-  async getSeason(slug) {
-    return this.request(`/v1/seasons/${slug}/`);
-  }
-
-  // ========= SERIES =========
-  async getSeries(params = {}) {
-    const cleanParams = Object.entries(params).reduce((acc, [key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        acc[key] = value;
-      }
-      return acc;
-    }, {});
-    const queryString = new URLSearchParams(cleanParams).toString();
-    return this.request(`/v1/series/${queryString ? `?${queryString}` : ''}`);
-  }
-
-  async getSeriesDetail(slug) {
-    return this.request(`/v1/series/${slug}/`);
-  }
-
-  // ========= LESSONS =========
-  async getLessons(params = {}) {
-    const cleanParams = Object.entries(params).reduce((acc, [key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        acc[key] = value;
-      }
-      return acc;
-    }, {});
-    const queryString = new URLSearchParams(cleanParams).toString();
-    return this.request(`/v1/lessons/${queryString ? `?${queryString}` : ''}`);
-  }
-
-  async getLesson(slug) {
-    return this.request(`/v1/lessons/${slug}/`);
-  }
-
-  // ========= EVENTS =========
-  async getEvents(params = {}) {
-    const cleanParams = Object.entries(params).reduce((acc, [key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        acc[key] = value;
-      }
-      return acc;
-    }, {});
-    const queryString = new URLSearchParams(cleanParams).toString();
-    // Hii inalingana na public events API yako: /api/v1/events/
-    return this.request(`/v1/events/${queryString ? `?${queryString}` : ''}`);
-  }
-
-  async getEvent(slug) {
-    return this.request(`/v1/events/${slug}/`);
-  }
-
-  async getUpcomingEvents() {
-    return this.request('/v1/events/upcoming/');
-  }
-
-  async getFeaturedEvents() {
-    return this.request('/v1/events/featured/');
-  }
-
-  // ========= MEDIA =========
-  async getMediaItems(params = {}) {
-    const cleanParams = Object.entries(params).reduce((acc, [key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        acc[key] = value;
-      }
-      return acc;
-    }, {});
-    const queryString = new URLSearchParams(cleanParams).toString();
-    return this.request(`/v1/media/${queryString ? `?${queryString}` : ''}`);
-  }
-
-  async getMediaItem(id) {
-    return this.request(`/v1/media/${id}/`);
-  }
-
-  // ========= PRAYER REQUESTS =========
-  async submitPrayerRequest(data) {
-    return this.request('/v1/prayer-requests/', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+function safeJsonParse(text) {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
   }
 }
 
-export default new ApiService();
+function normalizeApiError(payload, fallback = "Request failed") {
+  if (!payload) return fallback;
+  if (typeof payload === "string") return payload;
+  if (payload.detail) return payload.detail;
+
+  const k = Object.keys(payload)[0];
+  if (k) {
+    const v = payload[k];
+    if (Array.isArray(v) && v[0]) return String(v[0]);
+    if (typeof v === "string") return v;
+  }
+  return fallback;
+}
+
+function getAccessToken() {
+  return localStorage.getItem(ACCESS_KEY);
+}
+
+function getRefreshToken() {
+  return localStorage.getItem(REFRESH_KEY);
+}
+
+function setTokens(access, refresh) {
+  if (access) localStorage.setItem(ACCESS_KEY, access);
+  if (refresh) localStorage.setItem(REFRESH_KEY, refresh);
+}
+
+function clearTokens() {
+  localStorage.removeItem(ACCESS_KEY);
+  localStorage.removeItem(REFRESH_KEY);
+}
+
+async function refreshAccessToken() {
+  const refresh = getRefreshToken();
+  if (!refresh) throw new Error("No refresh token");
+
+  const res = await fetch(`${API_BASE_URL}/api/v1/auth/token/refresh/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ refresh }),
+  });
+
+  const text = await res.text();
+  const payload = safeJsonParse(text);
+
+  if (!res.ok) {
+    throw new Error(normalizeApiError(payload, "Session expired. Please login again."));
+  }
+
+  const access = payload?.access;
+  if (!access) throw new Error("Invalid refresh response");
+  setTokens(access, refresh);
+  return access;
+}
+
+async function request(path, { method = "GET", body, auth = false, retryOn401 = true } = {}) {
+  const headers = { "Content-Type": "application/json" };
+  let access = getAccessToken();
+
+  if (auth) {
+    if (access) headers.Authorization = `Bearer ${access}`;
+  }
+
+  const res = await fetch(`${API_BASE_URL}${path}`, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : undefined,
+  });
+
+  // If unauthorized, try refresh once
+  if (auth && res.status === 401 && retryOn401) {
+    try {
+      access = await refreshAccessToken();
+    } catch {
+      clearTokens();
+      throw new Error("Session expired. Please login again.");
+    }
+
+    const retryHeaders = { ...headers, Authorization: `Bearer ${access}` };
+    const res2 = await fetch(`${API_BASE_URL}${path}`, {
+      method,
+      headers: retryHeaders,
+      body: body ? JSON.stringify(body) : undefined,
+    });
+
+    const text2 = await res2.text();
+    const payload2 = safeJsonParse(text2);
+
+    if (!res2.ok) throw new Error(normalizeApiError(payload2, "Request failed"));
+    return payload2 ?? {};
+  }
+
+  const text = await res.text();
+  const payload = safeJsonParse(text);
+
+  if (!res.ok) throw new Error(normalizeApiError(payload, "Request failed"));
+  return payload ?? {};
+}
+
+const api = {
+  // token helpers
+  getAccessToken,
+  getRefreshToken,
+  setTokens,
+  clearTokens,
+  refreshAccessToken,
+
+  // AUTH (OpenAPI)
+  async login(identifier, password) {
+    const data = await request("/api/v1/auth/login/", {
+      method: "POST",
+      body: { identifier, password }, // <-- OpenAPI: Login schema
+      auth: false,
+    });
+    // OpenAPI response: {access, refresh, user}
+    api.setTokens(data.access, data.refresh);
+    return data;
+  },
+
+  async logout() {
+    const refresh = getRefreshToken();
+    if (!refresh) return { detail: "Already logged out." };
+
+    // OpenAPI: /logout/ requires jwtAuth + body {refresh}
+    const data = await request("/api/v1/auth/logout/", {
+      method: "POST",
+      body: { refresh },
+      auth: true,
+      retryOn401: false, // if access expired, just clear locally
+    });
+
+    api.clearTokens();
+    return data;
+  },
+
+  async resendVerification(email) {
+    // OpenAPI: /resend-verification/ {email}
+    return request("/api/v1/auth/resend-verification/", {
+      method: "POST",
+      body: { email },
+      auth: false,
+    });
+  },
+
+  async verifyEmail(token) {
+    // OpenAPI: /verify-email/ {token}
+    return request("/api/v1/auth/verify-email/", {
+      method: "POST",
+      body: { token },
+      auth: false,
+    });
+  },
+
+  // ACCOUNT (OpenAPI)
+  async getMe() {
+    return request("/api/v1/auth/me/", { method: "GET", auth: true });
+  },
+
+  async patchMe(payload) {
+    // OpenAPI ProfileUpdate fields: username, first_name, last_name, phone, location
+    return request("/api/v1/auth/me/", { method: "PATCH", body: payload, auth: true });
+  },
+
+  async changePassword(current_password, new_password) {
+    // OpenAPI: /change-password/ {current_password, new_password}
+    return request("/api/v1/auth/change-password/", {
+      method: "POST",
+      body: { current_password, new_password },
+      auth: true,
+    });
+  },
+
+  async changeEmail(new_email, password) {
+    // OpenAPI: /change-email/ {new_email, password}
+    return request("/api/v1/auth/change-email/", {
+      method: "POST",
+      body: { new_email, password },
+      auth: true,
+    });
+  },
+
+  async confirmEmailChange(token) {
+    // OpenAPI: /confirm-email-change/ {token}
+    return request("/api/v1/auth/confirm-email-change/", {
+      method: "POST",
+      body: { token },
+      auth: false,
+    });
+  },
+
+  // PASSWORD RESET (OpenAPI)
+  async passwordReset(email) {
+    return request("/api/v1/auth/password/reset/", {
+      method: "POST",
+      body: { email },
+      auth: false,
+    });
+  },
+
+  async passwordResetConfirm(uid, token, new_password) {
+    return request("/api/v1/auth/password/reset/confirm/", {
+      method: "POST",
+      body: { uid, token, new_password },
+      auth: false,
+    });
+  },
+};
+
+export default api;
