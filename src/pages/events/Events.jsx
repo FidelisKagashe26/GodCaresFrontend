@@ -13,6 +13,7 @@ import {
   Search,
   Sparkles,
   RefreshCw,
+  Share2,
 } from "lucide-react";
 
 function normalizeList(payload) {
@@ -28,7 +29,6 @@ export default function Events() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data: eventsRaw, loading, error, refetch } = useApi("events");
-
   const events = useMemo(() => normalizeList(eventsRaw), [eventsRaw]);
 
   const formatDate = (value) => {
@@ -45,7 +45,10 @@ export default function Events() {
   const formatTime = (value) => {
     if (!value) return "";
     const d = new Date(value);
-    return d.toLocaleTimeString("sw-TZ", { hour: "2-digit", minute: "2-digit" });
+    return d.toLocaleTimeString("sw-TZ", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   const getStartDate = (ev) => ev?.start_date || null;
@@ -116,6 +119,7 @@ export default function Events() {
             <button
               onClick={refetch}
               className="inline-flex items-center justify-center rounded-full bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 text-sm font-semibold transition-colors"
+              type="button"
             >
               <RefreshCw size={16} className="mr-2" />
               Pakia Upya
@@ -201,6 +205,7 @@ export default function Events() {
                       ? "bg-gray-900 border-gray-700 text-gray-300 hover:bg-gray-800"
                       : "bg-white border-gray-200 text-gray-700 hover:bg-gray-100"
                   }`}
+                  type="button"
                 >
                   {label}
                 </button>
@@ -215,14 +220,26 @@ export default function Events() {
             {filteredEvents.map((event) => {
               const startDate = getStartDate(event);
               const endDate = getEndDate(event);
+              const detailUrl = event?.slug ? `/matukio/${event.slug}` : null;
 
               return (
                 <article
                   key={event.slug || event.title}
-                  className={`group overflow-hidden rounded-2xl border shadow-sm transition-all hover:-translate-y-1 hover:shadow-md ${
-                    isDark ? "bg-gray-900/85 border-gray-800 hover:border-emerald-500/70" : "bg-white/95 border-gray-100 hover:border-emerald-500/70"
+                  className={`relative group overflow-hidden rounded-2xl border shadow-sm transition-all hover:-translate-y-1 hover:shadow-md focus-within:ring-2 focus-within:ring-emerald-500 ${
+                    isDark
+                      ? "bg-gray-900/85 border-gray-800 hover:border-emerald-500/70"
+                      : "bg-white/95 border-gray-100 hover:border-emerald-500/70"
                   }`}
                 >
+                  {/* CARD OVERLAY: inafanya card nzima ibonyezeke kwenda details */}
+                  {detailUrl ? (
+                    <Link
+                      to={detailUrl}
+                      className="absolute inset-0 z-10"
+                      aria-label={`Fungua maelezo ya tukio: ${event.title}`}
+                    />
+                  ) : null}
+
                   <div className="relative">
                     {event.image ? (
                       <div className="overflow-hidden rounded-t-2xl">
@@ -283,33 +300,51 @@ export default function Events() {
                       {event.max_attendees ? (
                         <div className="flex items-center">
                           <Users className="text-sky-500 mr-2" size={14} />
-                          <span className={isDark ? "text-gray-300" : "text-gray-600"}>Hadi watu {event.max_attendees}</span>
+                          <span className={isDark ? "text-gray-300" : "text-gray-600"}>
+                            Hadi watu {event.max_attendees}
+                          </span>
                         </div>
                       ) : null}
                     </div>
 
-                    <div className="mt-auto flex flex-col sm:flex-row gap-2">
-                      {event.slug && (
+                    {/* Actions (ziwe juu ya overlay) */}
+                    <div className="mt-auto flex items-center gap-2 relative z-20">
+                      {/* “Soma zaidi” (kamshare) */}
+                      {detailUrl ? (
                         <Link
-                          to={`/matukio/${event.slug}`}
-                          className="flex-1 inline-flex items-center justify-center rounded-lg bg-emerald-600 text-white text-[12px] font-semibold py-2.5 hover:bg-emerald-700 transition-colors"
+                          to={detailUrl}
+                          className={`flex-1 inline-flex items-center justify-center rounded-lg border px-3 py-2.5 text-[12px] font-semibold transition-colors ${
+                            isDark
+                              ? "border-gray-700 text-emerald-200 hover:bg-gray-900"
+                              : "border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                          }`}
                         >
-                          <Calendar size={14} className="mr-1.5" />
-                          Tazama Maelezo
+                          <Share2 size={14} className="mr-1.5" />
+                          Soma zaidi
                         </Link>
+                      ) : (
+                        <span
+                          className={`flex-1 inline-flex items-center justify-center rounded-lg border px-3 py-2.5 text-[12px] font-semibold ${
+                            isDark ? "border-gray-800 text-gray-500" : "border-gray-200 text-gray-500"
+                          }`}
+                        >
+                          <Share2 size={14} className="mr-1.5" />
+                          Soma zaidi
+                        </span>
                       )}
 
-                      {event.registration_url && (
+                      {/* Registration (ibaki clickable) */}
+                      {event.registration_url ? (
                         <a
                           href={event.registration_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex-1 inline-flex items-center justify-center rounded-lg border border-emerald-500 text-emerald-600 text-[12px] font-semibold py-2.5 hover:bg-emerald-50 dark:text-emerald-300 dark:border-emerald-400 dark:hover:bg-gray-900 transition-colors"
+                          className="flex-1 inline-flex items-center justify-center rounded-lg bg-emerald-600 text-white text-[12px] font-semibold py-2.5 hover:bg-emerald-700 transition-colors"
                         >
                           <ExternalLink size={14} className="mr-1.5" />
-                          Jisajili Sasa
+                          Jisajili
                         </a>
-                      )}
+                      ) : null}
                     </div>
                   </div>
                 </article>
