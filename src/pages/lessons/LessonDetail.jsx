@@ -16,6 +16,7 @@ import {
   Share2,
   ExternalLink,
   RefreshCw,
+  ChevronRight,
 } from "lucide-react";
 
 function getYouTubeId(url) {
@@ -26,7 +27,6 @@ function getYouTubeId(url) {
     if (u.hostname.includes("youtube.com")) return u.searchParams.get("v");
     return null;
   } catch {
-    // basic fallback
     const m1 = String(url).match(/v=([a-zA-Z0-9_-]{6,})/);
     if (m1?.[1]) return m1[1];
     const m2 = String(url).match(/youtu\.be\/([a-zA-Z0-9_-]{6,})/);
@@ -54,11 +54,9 @@ export default function LessonDetail() {
 
   const resourceTabs = useMemo(() => {
     const tabs = [{ key: "content", label: "Maudhui", icon: FileText }];
-
     if (lesson?.has_video) tabs.push({ key: "video", label: "Video", icon: Play });
     if (lesson?.has_pdf) tabs.push({ key: "pdf", label: "PDF", icon: Download });
     if (lesson?.has_audio) tabs.push({ key: "audio", label: "Audio", icon: FileText });
-
     return tabs;
   }, [lesson?.has_audio, lesson?.has_pdf, lesson?.has_video]);
 
@@ -187,12 +185,7 @@ export default function LessonDetail() {
               >
                 {/* Hero */}
                 <div className="relative">
-                  <img
-                    src={cover}
-                    alt={lesson.title}
-                    className="w-full h-56 md:h-72 object-cover"
-                    loading="lazy"
-                  />
+                  <img src={cover} alt={lesson.title} className="w-full h-56 md:h-72 object-cover" loading="lazy" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                   <div className="absolute bottom-4 left-4 right-4">
                     <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -237,29 +230,47 @@ export default function LessonDetail() {
                       </span>
                     </div>
 
-                    <div className={isDark ? "text-gray-400" : "text-gray-500"}>
-                      Imewekwa: {formatDate(lesson.created_at)}
-                    </div>
+                    <div className={isDark ? "text-gray-400" : "text-gray-500"}>Imewekwa: {formatDate(lesson.created_at)}</div>
                   </div>
 
-                  {/* Tabs */}
-                  <div className={`flex border-b text-xs md:text-sm ${isDark ? "border-gray-700" : "border-gray-200"}`}>
-                    {resourceTabs.map(({ key, label, icon: Icon }) => (
-                      <button
-                        key={key}
-                        onClick={() => setActiveTab(key)}
-                        className={`flex items-center px-4 md:px-5 py-2 font-semibold transition-colors ${
-                          activeTab === key
-                            ? "border-b-2 border-emerald-600 text-emerald-600"
-                            : isDark
-                            ? "text-gray-400 hover:text-white"
-                            : "text-gray-600 hover:text-gray-900"
+                  {/* Tabs (MOBILE SCROLL FIX) */}
+                  <div className={`relative border-b ${isDark ? "border-gray-700" : "border-gray-200"}`}>
+                    {/* hint on mobile kwamba kuna scroll */}
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none md:hidden">
+                      <div
+                        className={`flex items-center gap-1 text-[10px] font-semibold pr-1 ${
+                          isDark ? "text-gray-400" : "text-gray-500"
                         }`}
                       >
-                        <Icon size={16} className="mr-1.5" />
-                        {label}
-                      </button>
-                    ))}
+                        <span>Vuta</span>
+                        <ChevronRight size={14} />
+                      </div>
+                    </div>
+
+                    <div
+                      className="overflow-x-auto"
+                      style={{ WebkitOverflowScrolling: "touch" }}
+                    >
+                      <div className="flex flex-nowrap items-center gap-1 min-w-max">
+                        {resourceTabs.map(({ key, label, icon: Icon }) => (
+                          <button
+                            key={key}
+                            onClick={() => setActiveTab(key)}
+                            className={`shrink-0 whitespace-nowrap flex items-center px-4 md:px-5 py-2 font-semibold transition-colors ${
+                              activeTab === key
+                                ? "border-b-2 border-emerald-600 text-emerald-600"
+                                : isDark
+                                ? "text-gray-400 hover:text-white"
+                                : "text-gray-600 hover:text-gray-900"
+                            }`}
+                            type="button"
+                          >
+                            <Icon size={16} className="mr-1.5" />
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
 
                   {/* Content */}
@@ -278,7 +289,11 @@ export default function LessonDetail() {
                             dangerouslySetInnerHTML={{ __html: lesson.content }}
                           />
                         ) : (
-                          <div className={`rounded-xl border p-4 ${isDark ? "border-gray-800 text-gray-300" : "border-gray-200 text-gray-600"}`}>
+                          <div
+                            className={`rounded-xl border p-4 ${
+                              isDark ? "border-gray-800 text-gray-300" : "border-gray-200 text-gray-600"
+                            }`}
+                          >
                             Hakuna maudhui ya somo yaliyoandikwa bado.
                           </div>
                         )}
@@ -309,7 +324,11 @@ export default function LessonDetail() {
                             Fungua Video
                           </a>
                         ) : (
-                          <div className={`rounded-xl border p-4 ${isDark ? "border-gray-800 text-gray-300" : "border-gray-200 text-gray-600"}`}>
+                          <div
+                            className={`rounded-xl border p-4 ${
+                              isDark ? "border-gray-800 text-gray-300" : "border-gray-200 text-gray-600"
+                            }`}
+                          >
                             Hakuna video kwa somo hili.
                           </div>
                         )}
@@ -368,7 +387,11 @@ export default function LessonDetail() {
 
             {/* Sidebar */}
             <aside className="lg:col-span-1 space-y-5 md:space-y-6">
-              <div className={`rounded-2xl border p-5 ${isDark ? "bg-gray-900/85 border-gray-800" : "bg-white/95 border-gray-100"}`}>
+              <div
+                className={`rounded-2xl border p-5 ${
+                  isDark ? "bg-gray-900/85 border-gray-800" : "bg-white/95 border-gray-100"
+                }`}
+              >
                 <h3 className={`text-sm md:text-base font-bold mb-3 ${isDark ? "text-white" : "text-gray-900"}`}>
                   Maelezo ya Somo
                 </h3>
@@ -398,7 +421,11 @@ export default function LessonDetail() {
                 </div>
               </div>
 
-              <div className={`rounded-2xl border p-5 ${isDark ? "bg-gray-900/85 border-gray-800" : "bg-white/95 border-gray-100"}`}>
+              <div
+                className={`rounded-2xl border p-5 ${
+                  isDark ? "bg-gray-900/85 border-gray-800" : "bg-white/95 border-gray-100"
+                }`}
+              >
                 <h3 className={`text-sm md:text-base font-bold mb-3 ${isDark ? "text-white" : "text-gray-900"}`}>
                   Rasilimali
                 </h3>
@@ -408,6 +435,7 @@ export default function LessonDetail() {
                     <button
                       onClick={() => setActiveTab("video")}
                       className="w-full flex items-center justify-center rounded-lg bg-sky-600 hover:bg-sky-700 text-white py-2.5 transition-colors"
+                      type="button"
                     >
                       <Play size={16} className="mr-2" />
                       Tazama Video
