@@ -1,3 +1,4 @@
+// src/services/api.js
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "https://godcares.pythonanywhere.com").replace(/\/$/, "");
 
 const ACCESS_KEY = "gc365_access";
@@ -28,19 +29,27 @@ function normalizeApiError(payload, fallback = "Request failed") {
 function getAccessToken() {
   return localStorage.getItem(ACCESS_KEY);
 }
-
 function getRefreshToken() {
   return localStorage.getItem(REFRESH_KEY);
 }
-
 function setTokens(access, refresh) {
   if (access) localStorage.setItem(ACCESS_KEY, access);
   if (refresh) localStorage.setItem(REFRESH_KEY, refresh);
 }
-
 function clearTokens() {
   localStorage.removeItem(ACCESS_KEY);
   localStorage.removeItem(REFRESH_KEY);
+}
+
+function buildQuery(path, params = {}) {
+  const sp = new URLSearchParams();
+  Object.entries(params || {}).forEach(([k, v]) => {
+    if (v === undefined || v === null || v === "") return;
+    if (Array.isArray(v)) v.forEach((x) => sp.append(k, x));
+    else sp.append(k, String(v));
+  });
+  const qs = sp.toString();
+  return qs ? `${path}?${qs}` : path;
 }
 
 async function refreshAccessToken() {
@@ -122,10 +131,9 @@ const api = {
   async login(identifier, password) {
     const data = await request("/api/v1/auth/login/", {
       method: "POST",
-      body: { identifier, password }, // <-- OpenAPI: Login schema
+      body: { identifier, password },
       auth: false,
     });
-    // OpenAPI response: {access, refresh, user}
     api.setTokens(data.access, data.refresh);
     return data;
   },
@@ -134,12 +142,11 @@ const api = {
     const refresh = getRefreshToken();
     if (!refresh) return { detail: "Already logged out." };
 
-    // OpenAPI: /logout/ requires jwtAuth + body {refresh}
     const data = await request("/api/v1/auth/logout/", {
       method: "POST",
       body: { refresh },
       auth: true,
-      retryOn401: false, // if access expired, just clear locally
+      retryOn401: false,
     });
 
     api.clearTokens();
@@ -147,7 +154,6 @@ const api = {
   },
 
   async resendVerification(email) {
-    // OpenAPI: /resend-verification/ {email}
     return request("/api/v1/auth/resend-verification/", {
       method: "POST",
       body: { email },
@@ -156,7 +162,6 @@ const api = {
   },
 
   async verifyEmail(token) {
-    // OpenAPI: /verify-email/ {token}
     return request("/api/v1/auth/verify-email/", {
       method: "POST",
       body: { token },
@@ -164,18 +169,15 @@ const api = {
     });
   },
 
-  // ACCOUNT (OpenAPI)
   async getMe() {
     return request("/api/v1/auth/me/", { method: "GET", auth: true });
   },
 
   async patchMe(payload) {
-    // OpenAPI ProfileUpdate fields: username, first_name, last_name, phone, location
     return request("/api/v1/auth/me/", { method: "PATCH", body: payload, auth: true });
   },
 
   async changePassword(current_password, new_password) {
-    // OpenAPI: /change-password/ {current_password, new_password}
     return request("/api/v1/auth/change-password/", {
       method: "POST",
       body: { current_password, new_password },
@@ -184,7 +186,6 @@ const api = {
   },
 
   async changeEmail(new_email, password) {
-    // OpenAPI: /change-email/ {new_email, password}
     return request("/api/v1/auth/change-email/", {
       method: "POST",
       body: { new_email, password },
@@ -193,7 +194,6 @@ const api = {
   },
 
   async confirmEmailChange(token) {
-    // OpenAPI: /confirm-email-change/ {token}
     return request("/api/v1/auth/confirm-email-change/", {
       method: "POST",
       body: { token },
@@ -201,7 +201,6 @@ const api = {
     });
   },
 
-  // PASSWORD RESET (OpenAPI)
   async passwordReset(email) {
     return request("/api/v1/auth/password/reset/", {
       method: "POST",
@@ -216,6 +215,27 @@ const api = {
       body: { uid, token, new_password },
       auth: false,
     });
+  },
+
+  // =========================
+  // SHOP (OpenAPI)
+  // =========================
+  async getShopCategories() {
+    return request("/api/v1/shop/categories/", { method: "GET", auth: false });
+  },
+
+  async getShopProducts(params = {}) {
+    const path = buildQuery("/api/v1/shop/products/", params);
+    return request(path, { method: "GET", auth: false });
+  },
+
+  async getShopProduct(id) {
+    return request(`/api/v1/shop/products/${id}/`, { method: "GET", auth: false });
+  },
+
+  async createShopOrder(payload) {
+    // { product_id, quantity, full_name, phone, notes }
+    return request("/api/v1/shop/orders/", { method: "POST", body: payload, auth: false });
   },
 };
 
