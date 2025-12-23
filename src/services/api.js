@@ -234,9 +234,41 @@ const api = {
   },
 
   async createShopOrder(payload) {
-    // { product_id, quantity, full_name, phone, notes }
     return request("/api/v1/shop/orders/", { method: "POST", body: payload, auth: false });
   },
+
+  // =========================
+  // MEDIA (OpenAPI)
+  // =========================
+  async getMediaCategories() {
+    return request("/api/v1/media/categories/", { method: "GET", auth: false });
+  },
+
+  async getMediaItems(params = {}) {
+    const path = buildQuery("/api/v1/media/items/", params);
+    return request(path, { method: "GET", auth: false });
+  },
+
+  async getMediaItem(id) {
+    return request(`/api/v1/media/items/${id}/`, { method: "GET", auth: false });
+  },
+
+  // =========================
+  // NEWS (OpenAPI)
+  // =========================
+  async getNewsCategories() {
+    return request("/api/v1/news/categories/", { method: "GET", auth: false });
+  },
+
+  async getNewsPosts(params = {}) {
+    const path = buildQuery("/api/v1/news/posts/", params);
+    return request(path, { method: "GET", auth: false });
+  },
+
+  async getNewsPost(slug) {
+    return request(`/api/v1/news/posts/${slug}/`, { method: "GET", auth: false });
+  },
+
 };
 
 export default api;
