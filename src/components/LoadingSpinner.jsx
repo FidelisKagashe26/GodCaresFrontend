@@ -1,20 +1,42 @@
-export default function LoadingSpinner({ text = 'Loading...', size = 'md' }) {
-  const sizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-8 h-8',
-    lg: 'w-12 h-12',
+// src/components/LoadingSpinner.jsx
+import logo from "../assets/1000472563.png";
+
+export default function LoadingSpinner({ size = "md" }) {
+  const ringSize = {
+    sm: "w-12 h-12",
+    md: "w-16 h-16",
+    lg: "w-20 h-20",
+  };
+
+  const logoSize = {
+    sm: "w-10 h-10",
+    md: "w-12 h-12",
+    lg: "w-16 h-16",
   };
 
   return (
-    <div className="flex flex-col items-center justify-center space-y-4">
-      <div
-        className={`${sizeClasses[size]} animate-spin rounded-full border-4 border-gray-200 dark:border-gray-700 border-t-emerald-500`}
-      ></div>
-      {text && (
-        <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
-          {text}
-        </p>
-      )}
+    <div className="flex items-center justify-center">
+      <div className={`relative ${ringSize[size]}`}>
+        {/* Ring inayozunguka */}
+        <div
+          className={`absolute inset-0 animate-spin rounded-full border-4 border-gray-200 dark:border-gray-700 border-t-emerald-500`}
+          aria-hidden="true"
+        />
+
+        {/* Logo katikati */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <img
+            src={logo}
+            alt="GOD CARES 365"
+            className={`${logoSize[size]} object-contain`}
+            loading="eager"
+            decoding="async"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 }
