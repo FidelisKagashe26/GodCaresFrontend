@@ -3,15 +3,15 @@ import logo from "../assets/1000472563.png";
 
 export default function LoadingSpinner({ size = "md" }) {
   const ringSize = {
-    sm: "w-16 h-16",
-    md: "w-20 h-20",
-    lg: "w-32 h-32",
+    sm: "w-12 h-12",
+    md: "w-16 h-16",
+    lg: "w-20 h-20",
   };
 
   const logoSize = {
     sm: "w-10 h-10",
-    md: "w-20 h-20",
-    lg: "w-32 h-32",
+    md: "w-16 h-16",
+    lg: "w-20 h-20",
   };
 
   return (
@@ -19,7 +19,7 @@ export default function LoadingSpinner({ size = "md" }) {
       <div className={`relative ${ringSize[size]}`}>
         {/* Ring inayozunguka */}
         <div
-          className={`absolute inset-0 animate-spin rounded-full border-4 border-gray-200 dark:border-gray-700 border-t-emerald-500`}
+          className={`absolute inset-0 animate-spin rounded-full border-4 border-gray-200 border-t-emerald-500`}
           aria-hidden="true"
         />
 

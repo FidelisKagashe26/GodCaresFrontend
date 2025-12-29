@@ -28,19 +28,16 @@ import {
 export default function Navbar() {
   const rootRef = useRef(null);
 
-  // Desktop overflow measurement refs
-  const desktopNavRef = useRef(null);
-  const measureWrapRef = useRef(null);
+  // Desktop measurement refs
+  const desktopWrapRef = useRef(null);
   const measureMoreRef = useRef(null);
-  const measureItemRefs = useRef({}); // { [id]: HTMLElement }
+  const measureItemRefs = useRef({});
 
-  const [isOpen, setIsOpen] = useState(false); // mobile menu
+  const [isOpen, setIsOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
-
-  const [openMobileGroup, setOpenMobileGroup] = useState(null);
 
   const [containerWidth, setContainerWidth] = useState(0);
   const [itemWidths, setItemWidths] = useState({});
@@ -60,14 +57,12 @@ export default function Navbar() {
     setNotifOpen(false);
     setProfileOpen(false);
     setMoreOpen(false);
-    setOpenMobileGroup(null);
   };
 
   // Close menus on route change
   useEffect(() => {
     closeAllDropdowns();
     setIsOpen(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
   // Close on outside click
@@ -81,7 +76,6 @@ export default function Navbar() {
     };
     document.addEventListener("mousedown", onMouseDown);
     return () => document.removeEventListener("mousedown", onMouseDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Close on Escape
@@ -121,7 +115,6 @@ export default function Navbar() {
     [t]
   );
 
-  // Desktop order (flat links) — overflow goes into “Zaidi/More”
   const desktopOrder = useMemo(
     () => [
       navItems.home,
@@ -135,28 +128,6 @@ export default function Navbar() {
       navItems.donations,
     ],
     [navItems]
-  );
-
-  // Mobile grouping (optional; keeps your nice structure in mobile)
-  const navGroupsMobile = useMemo(
-    () => [
-      {
-        id: "journey",
-        label: language === "sw" ? "Safari ya Imani" : "Faith Journey",
-        items: [navItems.studies, navItems.events],
-      },
-      {
-        id: "resources",
-        label: language === "sw" ? "Rasilimali" : "Resources",
-        items: [navItems.media, navItems.news, navItems.shop],
-      },
-      {
-        id: "spiritual",
-        label: language === "sw" ? "Huduma za Kiroho" : "Spiritual Care",
-        items: [navItems.prayers, navItems.donations, navItems.about],
-      },
-    ],
-    [language, navItems]
   );
 
   // Demo notifications
@@ -189,24 +160,23 @@ export default function Navbar() {
     }
   };
 
-  // Observe desktop container width
+  // Observe available width
   useEffect(() => {
-    if (!desktopNavRef.current) return;
+    if (!desktopWrapRef.current) return;
 
-    const el = desktopNavRef.current;
+    const el = desktopWrapRef.current;
     const ro = new ResizeObserver(() => {
       const w = Math.floor(el.getBoundingClientRect().width || 0);
       setContainerWidth(w);
     });
-    ro.observe(el);
 
-    // initial
+    ro.observe(el);
     setContainerWidth(Math.floor(el.getBoundingClientRect().width || 0));
 
     return () => ro.disconnect();
   }, []);
 
-  // Measure widths (always keep measurement nodes mounted offscreen)
+  // Measure widths (offscreen)
   useLayoutEffect(() => {
     const nextItemWidths = {};
     for (const item of desktopOrder) {
@@ -217,78 +187,15 @@ export default function Navbar() {
       ? Math.ceil(measureMoreRef.current.getBoundingClientRect().width)
       : 0;
 
-    const sameMap =
-      Object.keys(nextItemWidths).length === Object.keys(itemWidths).length &&
-      Object.keys(nextItemWidths).every((k) => nextItemWidths[k] === itemWidths[k]);
+    setItemWidths((prev) => {
+      const prevKeys = Object.keys(prev);
+      const nextKeys = Object.keys(nextItemWidths);
+      const same = prevKeys.length === nextKeys.length && nextKeys.every((k) => prev[k] === nextItemWidths[k]);
+      return same ? prev : nextItemWidths;
+    });
 
-    if (!sameMap) setItemWidths(nextItemWidths);
-    if (nextMoreWidth !== moreWidth) setMoreWidth(nextMoreWidth);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setMoreWidth((prev) => (prev === nextMoreWidth ? prev : nextMoreWidth));
   }, [desktopOrder, language]);
-
-  // Compute which items are visible vs overflow
-  const { visibleIds, overflowIds, showMore } = useMemo(() => {
-    const ids = desktopOrder.map((x) => x.id);
-
-    // If we don't have measurements yet, show all (safe default)
-    const hasAll =
-      ids.every((id) => typeof itemWidths[id] === "number" && itemWidths[id] > 0) && containerWidth > 0;
-
-    if (!hasAll) {
-      return { visibleIds: ids, overflowIds: [], showMore: false };
-    }
-
-    const fitWithoutMore = () => {
-      let used = 0;
-      const vis = [];
-      const ov = [];
-      for (const id of ids) {
-        const w = itemWidths[id] || 0;
-        if (used + w <= containerWidth) {
-          vis.push(id);
-          used += w;
-        } else {
-          ov.push(id);
-        }
-      }
-      return { vis, ov };
-    };
-
-    const firstPass = fitWithoutMore();
-    if (firstPass.ov.length === 0) {
-      return { visibleIds: firstPass.vis, overflowIds: [], showMore: false };
-    }
-
-    const available = Math.max(0, containerWidth - (moreWidth || 0));
-    let used = 0;
-    const vis = [];
-    const ov = [];
-
-    for (const id of ids) {
-      const w = itemWidths[id] || 0;
-      if (used + w <= available) {
-        vis.push(id);
-        used += w;
-      } else {
-        ov.push(id);
-      }
-    }
-
-    // Ensure at least Home stays visible if possible
-    if (!vis.includes("home")) {
-      vis.unshift("home");
-      const homeIdx = ov.indexOf("home");
-      if (homeIdx >= 0) ov.splice(homeIdx, 1);
-    }
-
-    return { visibleIds: vis, overflowIds: ov, showMore: true };
-  }, [containerWidth, desktopOrder, itemWidths, moreWidth]);
-
-  const isMoreActive = useMemo(() => {
-    const byId = Object.fromEntries(desktopOrder.map((x) => [x.id, x]));
-    return overflowIds.some((id) => byId[id] && isActive(byId[id].href));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [overflowIds, desktopOrder, location.pathname]);
 
   const moreLabel = language === "sw" ? "Zaidi" : "More";
 
@@ -298,6 +205,98 @@ export default function Navbar() {
     return map;
   }, [desktopOrder]);
 
+  const DESKTOP_GAP_PX = 8;
+  const MAX_VISIBLE_DESKTOP = 6;
+
+  const { visibleIds, overflowIds, showMore } = useMemo(() => {
+    const ids = desktopOrder.map((x) => x.id);
+
+    const hasAll =
+      containerWidth > 0 && ids.every((id) => typeof itemWidths[id] === "number" && itemWidths[id] > 0);
+
+    if (!hasAll) {
+      const fallbackVisible = ids.slice(0, Math.min(ids.length, MAX_VISIBLE_DESKTOP));
+      const fallbackOverflow = ids.slice(fallbackVisible.length);
+      return {
+        visibleIds: fallbackVisible,
+        overflowIds: fallbackOverflow,
+        showMore: fallbackOverflow.length > 0,
+      };
+    }
+
+    const fitsAllWithoutMore = () => {
+      let used = 0;
+      for (let i = 0; i < ids.length; i++) {
+        const id = ids[i];
+        const w = itemWidths[id] || 0;
+        const gap = i === 0 ? 0 : DESKTOP_GAP_PX;
+        if (used + gap + w <= containerWidth) used += gap + w;
+        else return false;
+      }
+      return true;
+    };
+
+    // Even if all fits, keep "link chache"
+    if (fitsAllWithoutMore()) {
+      const vis = ids.slice(0, Math.min(ids.length, MAX_VISIBLE_DESKTOP));
+      const ov = ids.slice(vis.length);
+      return { visibleIds: vis, overflowIds: ov, showMore: ov.length > 0 };
+    }
+
+    // Need More: reserve space for More + gap
+    const spaceForMore = (moreWidth || 0) + DESKTOP_GAP_PX;
+    const available = Math.max(0, containerWidth - spaceForMore);
+
+    let used = 0;
+    const vis = [];
+    const ov = [];
+
+    for (let i = 0; i < ids.length; i++) {
+      const id = ids[i];
+      const w = itemWidths[id] || 0;
+      const gap = vis.length === 0 ? 0 : DESKTOP_GAP_PX;
+
+      if (used + gap + w <= available) {
+        vis.push(id);
+        used += gap + w;
+      } else {
+        ov.push(id);
+      }
+    }
+
+    if (!vis.includes("home")) {
+      const homeIdx = ov.indexOf("home");
+      if (homeIdx >= 0) ov.splice(homeIdx, 1);
+      vis.unshift("home");
+    }
+
+    if (vis.length > MAX_VISIBLE_DESKTOP) {
+      const extra = vis.splice(MAX_VISIBLE_DESKTOP);
+      ov.unshift(...extra);
+    }
+
+    return { visibleIds: vis, overflowIds: ov, showMore: true };
+  }, [containerWidth, desktopOrder, itemWidths, moreWidth]);
+
+  const isMoreActive = useMemo(() => {
+    return overflowIds.some((id) => {
+      const item = desktopItemById[id];
+      return item && isActive(item.href);
+    });
+  }, [overflowIds, desktopItemById, location.pathname]);
+
+  const pillBase =
+    "inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[12px] font-medium transition-all border border-transparent";
+
+  // Solid dropdown (no transparency)
+  const dropdownPanel = `rounded-2xl border shadow-xl ${
+    isDark ? "bg-gray-900 border-gray-700" : "bg-white border-gray-200"
+  }`;
+
+  // Rounded hover items inside dropdown (so hover/background has radius)
+  const dropItemBase =
+    "mx-2 my-1 flex items-center gap-2 px-3 py-2 text-[12px] transition-colors rounded-lg";
+
   return (
     <nav
       ref={rootRef}
@@ -306,7 +305,7 @@ export default function Navbar() {
       }`}
     >
       {/* Hidden measurement row (offscreen) */}
-      <div ref={measureWrapRef} className="absolute -left-[9999px] top-0 h-0 overflow-hidden">
+      <div className="absolute -left-[9999px] top-0 h-0 overflow-hidden">
         <div className="flex items-center gap-2">
           {desktopOrder.map((item) => {
             const Icon = item.icon;
@@ -317,18 +316,14 @@ export default function Navbar() {
                   if (el) measureItemRefs.current[item.id] = el;
                 }}
                 type="button"
-                className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[12px] font-medium"
+                className={`${pillBase} text-gray-700`}
               >
                 <Icon size={14} />
                 <span>{item.name}</span>
               </button>
             );
           })}
-          <button
-            ref={measureMoreRef}
-            type="button"
-            className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[12px] font-medium"
-          >
+          <button ref={measureMoreRef} type="button" className={`${pillBase} text-gray-700`}>
             <span>{moreLabel}</span>
             <ChevronDown size={14} />
           </button>
@@ -336,11 +331,11 @@ export default function Navbar() {
       </div>
 
       <div className="container mx-auto px-3 md:px-4">
-        <div className="flex items-center justify-between h-14 md:h-16">
+        <div className="flex items-center justify-between h-14 md:h-16 gap-2">
           {/* Brand */}
           <Link
             to="/"
-            className="flex items-center gap-3"
+            className="flex items-center gap-3 shrink-0"
             onClick={() => {
               closeAllDropdowns();
               setIsOpen(false);
@@ -368,115 +363,120 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* Desktop nav (links + overflow into More/Zaidi) */}
-          <div className="hidden lg:flex items-center gap-2 min-w-0 flex-1 justify-center">
-            <div ref={desktopNavRef} className="flex items-center gap-2 min-w-0">
-              {visibleIds.map((id) => {
-                const item = desktopItemById[id];
-                if (!item) return null;
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.id}
-                    to={item.href}
-                    onClick={closeAllDropdowns}
-                    className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[12px] font-medium transition-all ${
-                      isActive(item.href)
-                        ? "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300 border border-emerald-500/60 shadow-sm"
-                        : isDark
-                        ? "text-gray-300 hover:text-white hover:bg-gray-800/80"
-                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                    }`}
-                  >
-                    <Icon size={14} />
-                    <span>{item.name}</span>
-                  </Link>
-                );
-              })}
+          {/* Desktop nav */}
+          <div className="hidden lg:flex min-w-0 flex-1 justify-center">
+            <div
+              ref={desktopWrapRef}
+              className="relative w-full max-w-[920px] min-w-0 overflow-visible"
+            >
+              <div className="flex items-center justify-center gap-2 min-w-0 overflow-visible">
+                {visibleIds.map((id) => {
+                  const item = desktopItemById[id];
+                  if (!item) return null;
+                  const Icon = item.icon;
+                  const active = isActive(item.href);
 
-              {showMore && overflowIds.length > 0 && (
-                <div className="relative">
-                  <button
-                    type="button"
-                    aria-haspopup="menu"
-                    aria-expanded={moreOpen}
-                    onClick={() => {
-                      // toggle open/close on repeated click
-                      setMoreOpen((v) => !v);
-                      // close other dropdowns only (keep More toggle)
-                      setLangOpen(false);
-                      setNotifOpen(false);
-                      setProfileOpen(false);
-                    }}
-                    className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[12px] font-medium transition-all ${
-                      isMoreActive
-                        ? "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300 border border-emerald-500/60 shadow-sm"
-                        : isDark
-                        ? "text-gray-300 hover:text-white hover:bg-gray-800/80"
-                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                    }`}
-                  >
-                    <span>{moreLabel}</span>
-                    <ChevronDown size={14} className={`transition-transform ${moreOpen ? "rotate-180" : ""}`} />
-                  </button>
-
-                  {moreOpen && (
-                    <div
-                      role="menu"
-                      className={`absolute left-0 mt-2 w-56 rounded-xl border shadow-lg shadow-gray-900/10 ${
-                        isDark ? "bg-gray-900 border-gray-700" : "bg-white border-gray-200"
+                  return (
+                    <Link
+                      key={item.id}
+                      to={item.href}
+                      onClick={closeAllDropdowns}
+                      className={`${pillBase} ${
+                        active
+                          ? "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300 border-emerald-500/60 shadow-sm"
+                          : isDark
+                          ? "text-gray-300 hover:text-white hover:bg-gray-800/80"
+                          : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                       }`}
                     >
-                      <div className="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
-                        <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-gray-300" : "text-gray-600"}`}>
-                          {moreLabel}
-                        </p>
+                      <Icon size={14} />
+                      <span>{item.name}</span>
+                    </Link>
+                  );
+                })}
+
+                {/* MORE dropdown - now behaves like profile dropdown */}
+                {showMore && overflowIds.length > 0 && (
+                  <div className="relative">
+                    <button
+                      type="button"
+                      aria-haspopup="menu"
+                      aria-expanded={moreOpen}
+                      onClick={() => {
+                        setMoreOpen((v) => !v);
+                        setLangOpen(false);
+                        setNotifOpen(false);
+                        setProfileOpen(false);
+                      }}
+                      className={`${pillBase} ${
+                        isMoreActive
+                          ? "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300 border-emerald-500/60 shadow-sm"
+                          : isDark
+                          ? "text-gray-300 hover:text-white hover:bg-gray-800/80"
+                          : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                      }`}
+                    >
+                      <span>{moreLabel}</span>
+                      <ChevronDown size={14} className={`transition-transform ${moreOpen ? "rotate-180" : ""}`} />
+                    </button>
+
+                    {moreOpen && (
+                      <div
+                        role="menu"
+                        className={`absolute left-0 top-full mt-2 z-50 w-60 ${dropdownPanel}`}
+                      >
+                        <div className={`px-4 py-2 border-b ${isDark ? "border-gray-700" : "border-gray-100"}`}>
+                          <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-gray-300" : "text-gray-600"}`}>
+                            {moreLabel}
+                          </p>
+                        </div>
+
+                        <div className="py-2">
+                          {overflowIds.map((oid) => {
+                            const oitem = desktopItemById[oid];
+                            if (!oitem) return null;
+                            const Icon = oitem.icon;
+                            const active = isActive(oitem.href);
+
+                            return (
+                              <Link
+                                key={oitem.id}
+                                to={oitem.href}
+                                onClick={() => {
+                                  closeAllDropdowns();
+                                  setMoreOpen(false);
+                                }}
+                                className={`${dropItemBase} ${
+                                  active
+                                    ? "bg-emerald-500/10 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-200"
+                                    : isDark
+                                    ? "text-gray-200 hover:bg-gray-800 hover:text-white"
+                                    : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                                }`}
+                              >
+                                <Icon size={15} />
+                                <span>{oitem.name}</span>
+                              </Link>
+                            );
+                          })}
+                        </div>
                       </div>
-                      <div className="py-1">
-                        {overflowIds.map((id) => {
-                          const item = desktopItemById[id];
-                          if (!item) return null;
-                          const Icon = item.icon;
-                          return (
-                            <Link
-                              key={item.id}
-                              to={item.href}
-                              onClick={() => {
-                                closeAllDropdowns();
-                                setMoreOpen(false);
-                              }}
-                              className={`flex items-center gap-2 px-3 py-2 text-[12px] transition-colors ${
-                                isActive(item.href)
-                                  ? "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300"
-                                  : isDark
-                                  ? "text-gray-300 hover:bg-gray-800 hover:text-white"
-                                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                              }`}
-                            >
-                              <Icon size={15} />
-                              <span>{item.name}</span>
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
           {/* Right controls */}
-          <div className="flex items-center gap-1 md:gap-2 relative">
+          <div className="flex items-center gap-1 md:gap-2 relative shrink-0">
             {isAuthenticated ? (
               <>
                 {/* Notifications */}
                 <div className="relative">
                   <button
                     onClick={() => {
-                      // toggle
                       setNotifOpen((v) => !v);
-                      // close others
                       setLangOpen(false);
                       setProfileOpen(false);
                       setMoreOpen(false);
@@ -496,12 +496,8 @@ export default function Navbar() {
                   </button>
 
                   {notifOpen && (
-                    <div
-                      className={`absolute right-0 mt-2 w-80 rounded-xl border shadow-xl shadow-gray-900/15 ${
-                        isDark ? "bg-gray-900 border-gray-700" : "bg-white border-gray-200"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+                    <div className={`absolute right-0 mt-2 w-80 ${dropdownPanel}`}>
+                      <div className={`flex items-center justify-between px-4 py-2 border-b ${isDark ? "border-gray-700" : "border-gray-100"}`}>
                         <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
                           {language === "sw" ? "Taarifa za hivi karibuni" : "Recent notifications"}
                         </p>
@@ -516,7 +512,7 @@ export default function Navbar() {
                           notifications.map((item) => (
                             <div
                               key={item.id}
-                              className="px-4 py-3 text-[12px] border-b last:border-b-0 border-gray-100 dark:border-gray-700"
+                              className={`px-4 py-3 text-[12px] border-b last:border-b-0 ${isDark ? "border-gray-700" : "border-gray-100"}`}
                             >
                               <div className={`font-medium ${isDark ? "text-white" : "text-gray-900"}`}>{item.title}</div>
                               {item.description && (
@@ -575,33 +571,38 @@ export default function Navbar() {
                   </button>
 
                   {profileOpen && (
-                    <div
-                      className={`absolute right-0 mt-2 w-56 rounded-xl border shadow-xl shadow-gray-900/15 ${
-                        isDark ? "bg-gray-900 border-gray-700" : "bg-white border-gray-200"
-                      }`}
-                    >
-                      <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+                    <div className={`absolute right-0 mt-2 w-56 ${dropdownPanel}`}>
+                      <div className={`px-4 py-3 border-b ${isDark ? "border-gray-700" : "border-gray-100"}`}>
                         <p className={`text-[11px] font-semibold ${isDark ? "text-gray-100" : "text-gray-800"}`}>
                           {user?.first_name || user?.username || (language === "sw" ? "Akaunti" : "Account")}
                         </p>
                         <p className="text-[10px] text-gray-500 dark:text-gray-400">{user?.email || ""}</p>
                       </div>
 
-                      <Link
-                        to="/profile"
-                        className="flex items-center px-4 py-2 text-[12px] hover:bg-gray-100 dark:hover:bg-gray-800"
-                        onClick={closeAllDropdowns}
-                      >
-                        <UserIcon size={14} className="mr-2" />
-                        {language === "sw" ? "Profaili Yangu" : "My Profile"}
-                      </Link>
+                      <div className="py-2">
+                        <Link
+                          to="/profile"
+                          className={`${dropItemBase} ${
+                            isDark ? "text-gray-200 hover:bg-gray-800 hover:text-white" : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                          }`}
+                          onClick={closeAllDropdowns}
+                        >
+                          <UserIcon size={14} />
+                          {language === "sw" ? "Profaili Yangu" : "My Profile"}
+                        </Link>
 
-                      <button
-                        onClick={handleLogout}
-                        className="w-full text-left px-4 py-2 text-[12px] text-red-600 hover:bg-gray-100 dark:hover:bg-gray-800"
-                      >
-                        {language === "sw" ? "Toka (Logout)" : "Logout"}
-                      </button>
+                        {/* Last button: radius ndogo (rounded-md) + hover with radius */}
+                        <button
+                          onClick={handleLogout}
+                          className={`mx-2 my-1 w-[calc(100%-16px)] text-left px-3 py-2 text-[12px] transition-colors rounded-md ${
+                            isDark
+                              ? "text-red-300 hover:bg-gray-800"
+                              : "text-red-600 hover:bg-gray-100"
+                          }`}
+                        >
+                          {language === "sw" ? "Toka (Logout)" : "Logout"}
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -645,33 +646,39 @@ export default function Navbar() {
               </button>
 
               {langOpen && (
-                <div
-                  className={`absolute right-0 mt-2 w-32 rounded-xl border shadow-lg ${
-                    isDark ? "bg-gray-900 border-gray-700" : "bg-white border-gray-200"
-                  }`}
-                >
-                  <button
-                    onClick={() => {
-                      changeLanguage("sw");
-                      setLangOpen(false);
-                    }}
-                    className={`block w-full px-4 py-2 text-left text-[12px] hover:bg-gray-100 dark:hover:bg-gray-800 ${
-                      language === "sw" ? "font-semibold text-emerald-600 dark:text-emerald-300" : ""
-                    }`}
-                  >
-                    Kiswahili
-                  </button>
-                  <button
-                    onClick={() => {
-                      changeLanguage("en");
-                      setLangOpen(false);
-                    }}
-                    className={`block w-full px-4 py-2 text-left text-[12px] hover:bg-gray-100 dark:hover:bg-gray-800 ${
-                      language === "en" ? "font-semibold text-emerald-600 dark:text-emerald-300" : ""
-                    }`}
-                  >
-                    English
-                  </button>
+                <div className={`absolute right-0 mt-2 w-32 ${dropdownPanel}`}>
+                  <div className="py-2">
+                    <button
+                      onClick={() => {
+                        changeLanguage("sw");
+                        setLangOpen(false);
+                      }}
+                      className={`${dropItemBase} ${
+                        language === "sw"
+                          ? "font-semibold text-emerald-600 dark:text-emerald-300"
+                          : isDark
+                          ? "text-gray-200 hover:bg-gray-800 hover:text-white"
+                          : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                      }`}
+                    >
+                      Kiswahili
+                    </button>
+                    <button
+                      onClick={() => {
+                        changeLanguage("en");
+                        setLangOpen(false);
+                      }}
+                      className={`${dropItemBase} ${
+                        language === "en"
+                          ? "font-semibold text-emerald-600 dark:text-emerald-300"
+                          : isDark
+                          ? "text-gray-200 hover:bg-gray-800 hover:text-white"
+                          : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                      }`}
+                    >
+                      English
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -707,129 +714,38 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile panel */}
+        {/* Mobile panel (as you had: show all links) */}
         {isOpen && (
           <div className={`lg:hidden border-t ${isDark ? "border-gray-800" : "border-gray-200"}`}>
-            <div className="py-3 space-y-1 text-[11px]">
-              {isAuthenticated ? (
-                <div className="px-3 pb-2">
-                  <div className={`rounded-xl border p-3 ${isDark ? "border-gray-800 bg-gray-900/60" : "border-gray-200 bg-white/60"}`}>
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-blue-500 text-[12px] font-bold text-white">
-                        {initials}
-                      </div>
-                      <div className="leading-tight">
-                        <div className={`text-[12px] font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
-                          {user?.first_name || user?.username || (language === "sw" ? "Akaunti" : "Account")}
-                        </div>
-                        <div className="text-[10px] text-gray-500 dark:text-gray-400">{user?.email || ""}</div>
-                      </div>
-                    </div>
-
-                    <div className="mt-3 grid grid-cols-2 gap-2">
+            <div className="py-3 space-y-2">
+              <div className="px-3">
+                <div className={`rounded-2xl border p-2 ${isDark ? "border-gray-800 bg-gray-900/50" : "border-gray-200 bg-white/60"}`}>
+                  {desktopOrder.map((item) => {
+                    const Icon = item.icon;
+                    const active = isActive(item.href);
+                    return (
                       <Link
-                        to="/profile"
+                        key={item.id}
+                        to={item.href}
                         onClick={() => setIsOpen(false)}
-                        className={`rounded-lg px-3 py-2 text-center text-[11px] font-semibold ${
-                          isDark ? "bg-gray-800 text-gray-100" : "bg-gray-100 text-gray-800"
+                        className={`flex items-center gap-2 rounded-xl px-3 py-2 text-[12px] font-semibold transition-colors ${
+                          active
+                            ? "bg-emerald-500/10 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-200"
+                            : isDark
+                            ? "text-gray-200 hover:bg-gray-800/70 hover:text-white"
+                            : "text-gray-700 hover:bg-gray-100"
                         }`}
                       >
-                        {language === "sw" ? "Profaili" : "Profile"}
+                        <Icon size={16} />
+                        <span>{item.name}</span>
                       </Link>
-                      <button
-                        onClick={handleLogout}
-                        className="rounded-lg px-3 py-2 text-center text-[11px] font-semibold bg-red-600/10 text-red-600 dark:text-red-300"
-                      >
-                        {language === "sw" ? "Toka" : "Logout"}
-                      </button>
-                    </div>
-                  </div>
+                    );
+                  })}
                 </div>
-              ) : (
-                <div className="px-2 pb-2 flex gap-2">
-                  <Link
-                    to="/login"
-                    onClick={() => setIsOpen(false)}
-                    className="flex-1 flex items-center justify-center gap-2 rounded-lg border border-emerald-500 px-3 py-2 text-[11px] font-semibold text-emerald-600 hover:bg-emerald-50 dark:border-emerald-400 dark:text-emerald-300 dark:hover:bg-gray-900"
-                  >
-                    <UserIcon size={14} />
-                    <span>{t("login") || (language === "sw" ? "Ingia" : "Login")}</span>
-                  </Link>
-                  <Link
-                    to="/register"
-                    onClick={() => setIsOpen(false)}
-                    className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-emerald-500 to-blue-600 px-3 py-2 text-[11px] font-semibold text-white shadow-sm shadow-emerald-500/40 hover:brightness-110"
-                  >
-                    <span>{t("register") || (language === "sw" ? "Jisajili" : "Register")}</span>
-                  </Link>
+
+                <div className="pt-2 text-center text-[10px] text-gray-500 dark:text-gray-400">
+                  {language === "sw" ? "God Cares 365 • Safari ya Imani" : "God Cares 365 • Faith Journey"}
                 </div>
-              )}
-
-              {/* Mobile quick Home */}
-              <div className="px-2">
-                <Link
-                  to={navItems.home.href}
-                  onClick={() => setIsOpen(false)}
-                  className={`flex items-center gap-2 rounded-lg px-2 py-2 text-[11px] font-semibold ${
-                    isActive(navItems.home.href)
-                      ? "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300"
-                      : isDark
-                      ? "text-gray-200 hover:bg-gray-800 hover:text-white"
-                      : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                  }`}
-                >
-                  <Home size={14} />
-                  <span>{navItems.home.name}</span>
-                </Link>
-              </div>
-
-              {/* Mobile groups */}
-              {navGroupsMobile.map((group) => (
-                <div key={group.id} className="px-2">
-                  <button
-                    type="button"
-                    onClick={() => setOpenMobileGroup((prev) => (prev === group.id ? null : group.id))}
-                    className={`flex w-full items-center justify-between rounded-lg px-2 py-2 text-[11px] font-semibold tracking-tight ${
-                      group.items.some((item) => isActive(item.href))
-                        ? "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300"
-                        : isDark
-                        ? "text-gray-200"
-                        : "text-gray-700"
-                    }`}
-                  >
-                    <span>{group.label}</span>
-                    <ChevronDown size={14} className={`transition-transform ${openMobileGroup === group.id ? "rotate-180" : ""}`} />
-                  </button>
-
-                  {openMobileGroup === group.id && (
-                    <div className="mt-1 space-y-0.5 rounded-lg bg-gray-50 p-1 dark:bg-gray-900/80">
-                      {group.items.map((item) => {
-                        const Icon = item.icon;
-                        return (
-                          <Link
-                            key={item.href}
-                            to={item.href}
-                            onClick={() => setIsOpen(false)}
-                            className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-[11px] ${
-                              isActive(item.href)
-                                ? "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300"
-                                : isDark
-                                ? "text-gray-300 hover:bg-gray-800 hover:text-white"
-                                : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                            }`}
-                          >
-                            <Icon size={14} />
-                            <span>{item.name}</span>
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              ))}
-
-              <div className="px-3 pt-1 pb-1 flex items-center justify-between text-[10px] text-gray-500 dark:text-gray-400">
-                <span>{language === "sw" ? "God Cares 365 • Safari ya Imani" : "God Cares 365 • Faith Journey"}</span>
               </div>
             </div>
           </div>
