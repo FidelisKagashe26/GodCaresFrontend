@@ -1,3 +1,4 @@
+// src/components/Navbar.jsx
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
@@ -29,7 +30,7 @@ export default function Navbar() {
   const rootRef = useRef(null);
 
   // Desktop measurement refs
-  const desktopWrapRef = useRef(null);
+  const desktopWrapRef = useRef(null); // width container
   const measureMoreRef = useRef(null);
   const measureItemRefs = useRef({});
 
@@ -160,7 +161,7 @@ export default function Navbar() {
     }
   };
 
-  // Observe available width
+  // Observe available width (desktop)
   useEffect(() => {
     if (!desktopWrapRef.current) return;
 
@@ -183,6 +184,7 @@ export default function Navbar() {
       const node = measureItemRefs.current[item.id];
       if (node) nextItemWidths[item.id] = Math.ceil(node.getBoundingClientRect().width);
     }
+
     const nextMoreWidth = measureMoreRef.current
       ? Math.ceil(measureMoreRef.current.getBoundingClientRect().width)
       : 0;
@@ -190,7 +192,8 @@ export default function Navbar() {
     setItemWidths((prev) => {
       const prevKeys = Object.keys(prev);
       const nextKeys = Object.keys(nextItemWidths);
-      const same = prevKeys.length === nextKeys.length && nextKeys.every((k) => prev[k] === nextItemWidths[k]);
+      const same =
+        prevKeys.length === nextKeys.length && nextKeys.every((k) => prev[k] === nextItemWidths[k]);
       return same ? prev : nextItemWidths;
     });
 
@@ -205,7 +208,9 @@ export default function Navbar() {
     return map;
   }, [desktopOrder]);
 
+  // Tailwind gap-2 = 8px
   const DESKTOP_GAP_PX = 8;
+  // Keep navbar clean: show at most these many items on desktop (rest -> More)
   const MAX_VISIBLE_DESKTOP = 6;
 
   const { visibleIds, overflowIds, showMore } = useMemo(() => {
@@ -214,6 +219,7 @@ export default function Navbar() {
     const hasAll =
       containerWidth > 0 && ids.every((id) => typeof itemWidths[id] === "number" && itemWidths[id] > 0);
 
+    // Fallback: show few then More (prevents weird states before measuring)
     if (!hasAll) {
       const fallbackVisible = ids.slice(0, Math.min(ids.length, MAX_VISIBLE_DESKTOP));
       const fallbackOverflow = ids.slice(fallbackVisible.length);
@@ -236,14 +242,14 @@ export default function Navbar() {
       return true;
     };
 
-    // Even if all fits, keep "link chache"
+    // Even if all fits, still keep "link chache"
     if (fitsAllWithoutMore()) {
       const vis = ids.slice(0, Math.min(ids.length, MAX_VISIBLE_DESKTOP));
       const ov = ids.slice(vis.length);
       return { visibleIds: vis, overflowIds: ov, showMore: ov.length > 0 };
     }
 
-    // Need More: reserve space for More + gap
+    // Need More: reserve space for More + one gap before it
     const spaceForMore = (moreWidth || 0) + DESKTOP_GAP_PX;
     const available = Math.max(0, containerWidth - spaceForMore);
 
@@ -264,12 +270,14 @@ export default function Navbar() {
       }
     }
 
+    // Ensure Home stays visible
     if (!vis.includes("home")) {
       const homeIdx = ov.indexOf("home");
       if (homeIdx >= 0) ov.splice(homeIdx, 1);
       vis.unshift("home");
     }
 
+    // Enforce cap
     if (vis.length > MAX_VISIBLE_DESKTOP) {
       const extra = vis.splice(MAX_VISIBLE_DESKTOP);
       ov.unshift(...extra);
@@ -285,15 +293,16 @@ export default function Navbar() {
     });
   }, [overflowIds, desktopItemById, location.pathname]);
 
+  // Base pill
   const pillBase =
     "inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[12px] font-medium transition-all border border-transparent";
 
-  // Solid dropdown (no transparency)
+  // Solid dropdown panel (NOT transparent)
   const dropdownPanel = `rounded-2xl border shadow-xl ${
     isDark ? "bg-gray-900 border-gray-700" : "bg-white border-gray-200"
   }`;
 
-  // Rounded hover items inside dropdown (so hover/background has radius)
+  // Rounded hover items inside dropdown
   const dropItemBase =
     "mx-2 my-1 flex items-center gap-2 px-3 py-2 text-[12px] transition-colors rounded-lg";
 
@@ -365,10 +374,8 @@ export default function Navbar() {
 
           {/* Desktop nav */}
           <div className="hidden lg:flex min-w-0 flex-1 justify-center">
-            <div
-              ref={desktopWrapRef}
-              className="relative w-full max-w-[920px] min-w-0 overflow-visible"
-            >
+            {/* IMPORTANT: overflow-visible so dropdowns show BELOW without pushing/clipping */}
+            <div ref={desktopWrapRef} className="relative w-full max-w-[920px] min-w-0 overflow-visible">
               <div className="flex items-center justify-center gap-2 min-w-0 overflow-visible">
                 {visibleIds.map((id) => {
                   const item = desktopItemById[id];
@@ -395,7 +402,7 @@ export default function Navbar() {
                   );
                 })}
 
-                {/* MORE dropdown - now behaves like profile dropdown */}
+                {/* MORE dropdown (absolute, below, solid like Profile dropdown) */}
                 {showMore && overflowIds.length > 0 && (
                   <div className="relative">
                     <button
@@ -421,12 +428,13 @@ export default function Navbar() {
                     </button>
 
                     {moreOpen && (
-                      <div
-                        role="menu"
-                        className={`absolute left-0 top-full mt-2 z-50 w-60 ${dropdownPanel}`}
-                      >
+                      <div role="menu" className={`absolute left-0 top-full mt-2 z-[60] w-60 ${dropdownPanel}`}>
                         <div className={`px-4 py-2 border-b ${isDark ? "border-gray-700" : "border-gray-100"}`}>
-                          <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-gray-300" : "text-gray-600"}`}>
+                          <p
+                            className={`text-[11px] font-semibold uppercase tracking-wide ${
+                              isDark ? "text-gray-300" : "text-gray-600"
+                            }`}
+                          >
                             {moreLabel}
                           </p>
                         </div>
@@ -496,8 +504,12 @@ export default function Navbar() {
                   </button>
 
                   {notifOpen && (
-                    <div className={`absolute right-0 mt-2 w-80 ${dropdownPanel}`}>
-                      <div className={`flex items-center justify-between px-4 py-2 border-b ${isDark ? "border-gray-700" : "border-gray-100"}`}>
+                    <div className={`absolute right-0 mt-2 w-80 z-[60] ${dropdownPanel}`}>
+                      <div
+                        className={`flex items-center justify-between px-4 py-2 border-b ${
+                          isDark ? "border-gray-700" : "border-gray-100"
+                        }`}
+                      >
                         <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
                           {language === "sw" ? "Taarifa za hivi karibuni" : "Recent notifications"}
                         </p>
@@ -512,14 +524,18 @@ export default function Navbar() {
                           notifications.map((item) => (
                             <div
                               key={item.id}
-                              className={`px-4 py-3 text-[12px] border-b last:border-b-0 ${isDark ? "border-gray-700" : "border-gray-100"}`}
+                              className={`px-4 py-3 text-[12px] border-b last:border-b-0 ${
+                                isDark ? "border-gray-700" : "border-gray-100"
+                              }`}
                             >
                               <div className={`font-medium ${isDark ? "text-white" : "text-gray-900"}`}>{item.title}</div>
                               {item.description && (
                                 <div className="mt-0.5 text-[11px] text-gray-500 dark:text-gray-400">{item.description}</div>
                               )}
                               {item.created_at && (
-                                <div className="mt-1 text-[10px] text-gray-400">{new Date(item.created_at).toLocaleString()}</div>
+                                <div className="mt-1 text-[10px] text-gray-400">
+                                  {new Date(item.created_at).toLocaleString()}
+                                </div>
                               )}
                             </div>
                           ))
@@ -542,7 +558,7 @@ export default function Navbar() {
                   )}
                 </div>
 
-                {/* Profile */}
+                {/* Profile (SOLID, not transparent) */}
                 <div className="relative">
                   <button
                     onClick={() => {
@@ -571,7 +587,7 @@ export default function Navbar() {
                   </button>
 
                   {profileOpen && (
-                    <div className={`absolute right-0 mt-2 w-56 ${dropdownPanel}`}>
+                    <div className={`absolute right-0 mt-2 w-56 z-[60] ${dropdownPanel}`}>
                       <div className={`px-4 py-3 border-b ${isDark ? "border-gray-700" : "border-gray-100"}`}>
                         <p className={`text-[11px] font-semibold ${isDark ? "text-gray-100" : "text-gray-800"}`}>
                           {user?.first_name || user?.username || (language === "sw" ? "Akaunti" : "Account")}
@@ -583,7 +599,9 @@ export default function Navbar() {
                         <Link
                           to="/profile"
                           className={`${dropItemBase} ${
-                            isDark ? "text-gray-200 hover:bg-gray-800 hover:text-white" : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                            isDark
+                              ? "text-gray-200 hover:bg-gray-800 hover:text-white"
+                              : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                           }`}
                           onClick={closeAllDropdowns}
                         >
@@ -591,13 +609,11 @@ export default function Navbar() {
                           {language === "sw" ? "Profaili Yangu" : "My Profile"}
                         </Link>
 
-                        {/* Last button: radius ndogo (rounded-md) + hover with radius */}
+                        {/* Last button: radius ndogo (rounded-md) */}
                         <button
                           onClick={handleLogout}
                           className={`mx-2 my-1 w-[calc(100%-16px)] text-left px-3 py-2 text-[12px] transition-colors rounded-md ${
-                            isDark
-                              ? "text-red-300 hover:bg-gray-800"
-                              : "text-red-600 hover:bg-gray-100"
+                            isDark ? "text-red-300 hover:bg-gray-800" : "text-red-600 hover:bg-gray-100"
                           }`}
                         >
                           {language === "sw" ? "Toka (Logout)" : "Logout"}
@@ -617,6 +633,7 @@ export default function Navbar() {
                   <UserIcon size={14} className="mr-1.5" />
                   {t("login") || (language === "sw" ? "Ingia" : "Login")}
                 </Link>
+
                 <Link
                   to="/register"
                   className="inline-flex items-center rounded-full bg-gradient-to-r from-emerald-500 to-blue-600 px-3.5 py-1.5 text-[12px] font-semibold text-white shadow-sm shadow-emerald-500/40 hover:brightness-110"
@@ -646,7 +663,7 @@ export default function Navbar() {
               </button>
 
               {langOpen && (
-                <div className={`absolute right-0 mt-2 w-32 ${dropdownPanel}`}>
+                <div className={`absolute right-0 mt-2 w-32 z-[60] ${dropdownPanel}`}>
                   <div className="py-2">
                     <button
                       onClick={() => {
@@ -663,6 +680,7 @@ export default function Navbar() {
                     >
                       Kiswahili
                     </button>
+
                     <button
                       onClick={() => {
                         changeLanguage("en");
@@ -714,15 +732,82 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile panel (as you had: show all links) */}
+        {/* Mobile panel: TOP login/register (guest) OR account card (logged) + ALL links visible */}
         {isOpen && (
           <div className={`lg:hidden border-t ${isDark ? "border-gray-800" : "border-gray-200"}`}>
             <div className="py-3 space-y-2">
+              {/* TOP AREA */}
+              {isAuthenticated ? (
+                <div className="px-3">
+                  <div
+                    className={`rounded-2xl border p-3 ${
+                      isDark ? "border-gray-800 bg-gray-900/60" : "border-gray-200 bg-white/60"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-blue-500 text-[12px] font-bold text-white">
+                        {initials}
+                      </div>
+                      <div className="leading-tight">
+                        <div className={`text-[12px] font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
+                          {user?.first_name || user?.username || (language === "sw" ? "Akaunti" : "Account")}
+                        </div>
+                        <div className="text-[10px] text-gray-500 dark:text-gray-400">{user?.email || ""}</div>
+                      </div>
+                    </div>
+
+                    <div className="mt-3 grid grid-cols-2 gap-2">
+                      <Link
+                        to="/profile"
+                        onClick={() => setIsOpen(false)}
+                        className={`rounded-xl px-3 py-2 text-center text-[11px] font-semibold ${
+                          isDark ? "bg-gray-800 text-gray-100" : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {language === "sw" ? "Profaili" : "Profile"}
+                      </Link>
+
+                      <button
+                        onClick={handleLogout}
+                        className="rounded-xl px-3 py-2 text-center text-[11px] font-semibold bg-red-600/10 text-red-600 dark:text-red-300 hover:bg-red-600/20 transition-colors"
+                      >
+                        {language === "sw" ? "Toka" : "Logout"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="px-3 flex gap-2">
+                  <Link
+                    to="/login"
+                    onClick={() => setIsOpen(false)}
+                    className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-emerald-500 px-3 py-2 text-[11px] font-semibold text-emerald-600 hover:bg-emerald-50 dark:border-emerald-400 dark:text-emerald-300 dark:hover:bg-gray-900"
+                  >
+                    <UserIcon size={14} />
+                    <span>{t("login") || (language === "sw" ? "Ingia" : "Login")}</span>
+                  </Link>
+
+                  <Link
+                    to="/register"
+                    onClick={() => setIsOpen(false)}
+                    className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-blue-600 px-3 py-2 text-[11px] font-semibold text-white shadow-sm shadow-emerald-500/40 hover:brightness-110"
+                  >
+                    <span>{t("register") || (language === "sw" ? "Jisajili" : "Register")}</span>
+                  </Link>
+                </div>
+              )}
+
+              {/* ALL LINKS */}
               <div className="px-3">
-                <div className={`rounded-2xl border p-2 ${isDark ? "border-gray-800 bg-gray-900/50" : "border-gray-200 bg-white/60"}`}>
+                <div
+                  className={`rounded-2xl border p-2 ${
+                    isDark ? "border-gray-800 bg-gray-900/50" : "border-gray-200 bg-white/60"
+                  }`}
+                >
                   {desktopOrder.map((item) => {
                     const Icon = item.icon;
                     const active = isActive(item.href);
+
                     return (
                       <Link
                         key={item.id}
