@@ -188,6 +188,77 @@ export const translations = {
     homeNewsletterBtn: 'Jiunge',
     homeNewsletterNote: 'Hatutakutumia spam. Unaweza kujitoa wakati wowote.',
 
+    // ABOUT PAGE
+    aboutSeoTitle: 'Kuhusu Sisi | God Cares 365',
+    aboutSeoDesc:
+      'Jifunze kuhusu historia, dhamira na maono ya God Cares 365 – jukwaa la masomo ya Biblia, maombi na habari za kiroho.',
+    aboutSeoKeywords: 'kuhusu sisi, God Cares 365, historia, dhamira, maono',
+
+    aboutBadge: 'Sisi ni Nani',
+    aboutTitle: 'Kuhusu GOD CARES 365',
+    aboutIntro:
+      'Jifunze zaidi kuhusu historia, dhamira na maono ya jukwaa hili la kiroho linalolenga kufikia kila mlango, kila nafsi, kila siku.',
+
+    aboutMissionTitle: 'Dhamira Yetu',
+    aboutMissionBody:
+      'Kupitia GOD CARES 365, tunalenga kueneza Upendo wa Mungu na Habari Njema kwa kila mtu. Tunataka kutoa mafunzo ya Biblia ya kina, habari zenye kukutia moyo, na rasilimali za kiroho zitakazosaidia watu kujenga imani yao, kupata matumaini na kutambua kwamba Mungu anawajali kila siku.',
+
+    aboutVisionTitle: 'Maono Yetu',
+    aboutVisionBody:
+      'Maono yetu ni kuona jamii ya waumini ikinyanyuka katika umoja wa kiroho, ikisaidia watu kupata neema na uponyaji wa kiroho. Tunataka kuwa kitovu kinachoaminika mtandaoni, ambapo kila mtu, popote alipo, anaweza kupata Neno la Mungu, ushauri na msaada wa kiroho kwa namna iliyo rahisi na ya kisasa.',
+
+    aboutHistoryTitle: 'Historia Yetu',
+    aboutHistoryP1:
+      'GOD CARES 365 ilianzishwa mnamo mwaka 2023 na kundi la vijana wapenzi wa mafundisho ya Biblia. Kusudi kuu lilikuwa kuanzisha jukwaa la mtandaoni linalotoa habari na rasilimali za kiroho kila siku, ili watu waweze kupata faraja, nguvu na mafunzo yanayoimarisha mwendo wao na Mungu.',
+    aboutHistoryP2:
+      'Tulianza kama kikundi kidogo cha waumini wanaosoma pamoja, na sasa tumeendelea kuwa jukwaa linalofikiwa na watu kutoka maeneo mbalimbali. Kila siku tunajitahidi kutoa maudhui ya hali ya juu yanayojenga imani, kuleta tumaini na kuhamasisha watu kuishi maisha yanayompendeza Mungu.',
+
+    aboutTeamTitle: 'Timu Yetu',
+    aboutTeamRole1: 'Mwanzilishi & Muongoza Masomo ya Biblia',
+    aboutTeamDesc1:
+      'Mwongozi wa kiroho mwenye uzoefu wa miaka mingi katika mafundisho ya Biblia na ushauri wa kiroho.',
+    aboutTeamRole2: 'Mhariri Mkuu wa Habari & Vipengele',
+    aboutTeamDesc2:
+      'Mhariri mwenye ujuzi wa kuandika makala za kiroho zenye kugusa maisha na kuhamasisha mabadiliko chanya.',
+    aboutTeamRole3: 'Mratibu wa Mitandao ya Kijamii',
+    aboutTeamDesc3:
+      'Mtaalamu wa mawasiliano ya kidijitali, anayeratibu ujumbe wetu kufika kwa haraka kupitia majukwaa ya mtandaoni.',
+
+    aboutContactTitle: 'Wasiliana Nasi',
+    aboutContactLocation: 'Dar es Salaam, Tanzania',
+    aboutFormNamePlaceholder: 'Jina Lako',
+    aboutFormEmailPlaceholder: 'Barua Pepe',
+    aboutFormMessagePlaceholder: 'Ujumbe Wako',
+    aboutFormSendBtn: 'Tuma Ujumbe',
+    
+    // NEWS (sw)
+    newsSeoTitle: "Habari & Vipengele",
+    newsSeoDesc: "Soma makala za kiroho, habari za jamii, na vipengele vya kujenga imani.",
+    newsSeoKeywords: "habari, makala, vipengele, kiroho, God Cares 365",
+
+    newsPageTitle: "Habari & Vipengele",
+    newsPageIntro: "Soma makala za kiroho, habari za jamii na vipengele vya kujenga imani na maisha ya kila siku.",
+
+    newsSearchPlaceholder: "Tafuta habari au makala...",
+    newsCategoryAll: "Yote",
+    newsCategoryPlaceholder: "Chuja kwa kategoria",
+    newsCategorySearchPlaceholder: "Tafuta kategoria...",
+    newsCategoryNoResults: "Hakuna kategoria.",
+
+    newsFeaturedTitle: "Habari Maalum",
+    newsFeaturedBadge: "Maalum",
+
+    newsNoCategory: "Bila Kundi",
+    newsReadMore: "Soma zaidi",
+    newsReadTimeSuffix: "min",
+
+    newsLoading: "Inapakia habari...",
+    newsNoResults: "Hakuna habari zilizopatikana kwa vigezo ulivyoweka.",
+    newsError: "Hitilafu katika kupakia habari.",
+
+    paginationPrev: "Nyuma",
+    paginationNext: "Mbele",
+
   },
 
   en: {
@@ -377,6 +448,77 @@ export const translations = {
     homeNewsletterEmailPlaceholder: 'Your email',
     homeNewsletterBtn: 'Subscribe',
     homeNewsletterNote: 'No spam. You can unsubscribe anytime.',
+
+    // ABOUT PAGE
+    aboutSeoTitle: 'About Us | God Cares 365',
+    aboutSeoDesc:
+      'Learn about the history, mission, and vision of God Cares 365 — a platform for Bible studies, prayers, and spiritual news.',
+    aboutSeoKeywords: 'about us, God Cares 365, history, mission, vision',
+
+    aboutBadge: 'Who We Are',
+    aboutTitle: 'About GOD CARES 365',
+    aboutIntro:
+      'Learn more about the history, mission, and vision of this faith-based platform focused on reaching every door, every soul, every day.',
+
+    aboutMissionTitle: 'Our Mission',
+    aboutMissionBody:
+      'Through GOD CARES 365, our mission is to share God’s love and the Good News with everyone. We aim to provide in-depth Bible teaching, encouraging news, and spiritual resources that help people build their faith, gain hope, and remember that God cares for them every day.',
+
+    aboutVisionTitle: 'Our Vision',
+    aboutVisionBody:
+      'Our vision is to see a community of believers rising in spiritual unity, helping people receive grace and spiritual healing. We want to be a trusted online hub where anyone, anywhere, can access God’s Word, guidance, and spiritual support in a simple and modern way.',
+
+    aboutHistoryTitle: 'Our History',
+    aboutHistoryP1:
+      'GOD CARES 365 was founded in 2023 by a group of young people passionate about Bible teaching. The main purpose was to build an online platform that provides daily spiritual resources and updates so people can find comfort, strength, and teachings that deepen their walk with God.',
+    aboutHistoryP2:
+      'We started as a small group of believers studying together, and we have grown into a platform reached by people from different places. Every day we strive to deliver high-quality content that strengthens faith, brings hope, and inspires people to live lives that please God.',
+
+    aboutTeamTitle: 'Our Team',
+    aboutTeamRole1: 'Founder & Bible Study Leader',
+    aboutTeamDesc1:
+      'A spiritual leader with many years of experience in Bible teaching and spiritual counseling.',
+    aboutTeamRole2: 'Chief Editor — News & Features',
+    aboutTeamDesc2:
+      'An editor skilled in writing spiritual articles that touch lives and inspire positive change.',
+    aboutTeamRole3: 'Social Media Coordinator',
+    aboutTeamDesc3:
+      'A digital communications specialist coordinating our message to reach people quickly through online platforms.',
+
+    aboutContactTitle: 'Contact Us',
+    aboutContactLocation: 'Dar es Salaam, Tanzania',
+    aboutFormNamePlaceholder: 'Your Name',
+    aboutFormEmailPlaceholder: 'Email Address',
+    aboutFormMessagePlaceholder: 'Your Message',
+    aboutFormSendBtn: 'Send Message',
+
+    // NEWS (en)
+    newsSeoTitle: "News & Features",
+    newsSeoDesc: "Read spiritual articles, community news, and faith-building features.",
+    newsSeoKeywords: "news, articles, features, faith, God Cares 365",
+
+    newsPageTitle: "News & Features",
+    newsPageIntro: "Read spiritual articles, community updates, and daily-life faith content.",
+
+    newsSearchPlaceholder: "Search news or articles...",
+    newsCategoryAll: "All",
+    newsCategoryPlaceholder: "Filter by category",
+    newsCategorySearchPlaceholder: "Search categories...",
+    newsCategoryNoResults: "No categories found.",
+
+    newsFeaturedTitle: "Featured",
+    newsFeaturedBadge: "Featured",
+
+    newsNoCategory: "Uncategorized",
+    newsReadMore: "Read more",
+    newsReadTimeSuffix: "min",
+
+    newsLoading: "Loading news...",
+    newsNoResults: "No results match your filters.",
+    newsError: "Failed to load news.",
+
+    paginationPrev: "Previous",
+    paginationNext: "Next",
 
   }
 };
