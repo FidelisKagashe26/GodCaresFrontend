@@ -75,12 +75,15 @@ async function refreshAccessToken() {
   return access;
 }
 
-async function request(path, { method = "GET", body, auth = false, retryOn401 = true } = {}) {
-  const headers = { "Content-Type": "application/json" };
+async function request(
+  path,
+  { method = "GET", body, auth = false, retryOn401 = true, headers: extraHeaders = {} } = {}
+) {
+  const headers = { "Content-Type": "application/json", ...extraHeaders };
   let access = getAccessToken();
 
-  if (auth) {
-    if (access) headers.Authorization = `Bearer ${access}`;
+  if (auth && access) {
+    headers.Authorization = `Bearer ${access}`;
   }
 
   const res = await fetch(`${API_BASE_URL}${path}`, {
@@ -89,7 +92,7 @@ async function request(path, { method = "GET", body, auth = false, retryOn401 = 
     body: body ? JSON.stringify(body) : undefined,
   });
 
-  // If unauthorized, try refresh once
+  // If unauthorized, try refresh once (only if auth=true)
   if (auth && res.status === 401 && retryOn401) {
     try {
       access = await refreshAccessToken();
@@ -127,8 +130,16 @@ const api = {
   clearTokens,
   refreshAccessToken,
 
+  // =========================
   // AUTH (OpenAPI)
+  // =========================
+  async register(payload) {
+    // POST /api/v1/auth/register/
+    return request("/api/v1/auth/register/", { method: "POST", body: payload, auth: false });
+  },
+
   async login(identifier, password) {
+    // POST /api/v1/auth/login/
     const data = await request("/api/v1/auth/login/", {
       method: "POST",
       body: { identifier, password },
@@ -139,6 +150,7 @@ const api = {
   },
 
   async logout() {
+    // POST /api/v1/auth/logout/ (jwtAuth)
     const refresh = getRefreshToken();
     if (!refresh) return { detail: "Already logged out." };
 
@@ -154,6 +166,7 @@ const api = {
   },
 
   async resendVerification(email) {
+    // POST /api/v1/auth/resend-verification/
     return request("/api/v1/auth/resend-verification/", {
       method: "POST",
       body: { email },
@@ -162,6 +175,7 @@ const api = {
   },
 
   async verifyEmail(token) {
+    // POST /api/v1/auth/verify-email/
     return request("/api/v1/auth/verify-email/", {
       method: "POST",
       body: { token },
@@ -170,14 +184,22 @@ const api = {
   },
 
   async getMe() {
+    // GET /api/v1/auth/me/ (jwtAuth)
     return request("/api/v1/auth/me/", { method: "GET", auth: true });
   },
 
+  async updateMe(payload) {
+    // PUT /api/v1/auth/me/
+    return request("/api/v1/auth/me/", { method: "PUT", body: payload, auth: true });
+  },
+
   async patchMe(payload) {
+    // PATCH /api/v1/auth/me/
     return request("/api/v1/auth/me/", { method: "PATCH", body: payload, auth: true });
   },
 
   async changePassword(current_password, new_password) {
+    // POST /api/v1/auth/change-password/
     return request("/api/v1/auth/change-password/", {
       method: "POST",
       body: { current_password, new_password },
@@ -186,6 +208,7 @@ const api = {
   },
 
   async changeEmail(new_email, password) {
+    // POST /api/v1/auth/change-email/
     return request("/api/v1/auth/change-email/", {
       method: "POST",
       body: { new_email, password },
@@ -194,6 +217,7 @@ const api = {
   },
 
   async confirmEmailChange(token) {
+    // POST /api/v1/auth/confirm-email-change/
     return request("/api/v1/auth/confirm-email-change/", {
       method: "POST",
       body: { token },
@@ -202,6 +226,7 @@ const api = {
   },
 
   async passwordReset(email) {
+    // POST /api/v1/auth/password/reset/
     return request("/api/v1/auth/password/reset/", {
       method: "POST",
       body: { email },
@@ -210,6 +235,7 @@ const api = {
   },
 
   async passwordResetConfirm(uid, token, new_password) {
+    // POST /api/v1/auth/password/reset/confirm/
     return request("/api/v1/auth/password/reset/confirm/", {
       method: "POST",
       body: { uid, token, new_password },
@@ -234,41 +260,182 @@ const api = {
   },
 
   async createShopOrder(payload) {
+    // POST /api/v1/shop/orders/ (public)
     return request("/api/v1/shop/orders/", { method: "POST", body: payload, auth: false });
   },
 
+  async getMyOrders() {
+    // GET /api/v1/shop/orders/my/ (jwtAuth)
+    return request("/api/v1/shop/orders/my/", { method: "GET", auth: true });
+  },
+
+  // (admin optional helpers)
+  async getShopOrdersAdmin() {
+    // GET /api/v1/shop/orders/ (jwtAuth)
+    return request("/api/v1/shop/orders/", { method: "GET", auth: true });
+  },
+
+  async getShopOrderAdmin(id) {
+    // GET /api/v1/shop/orders/{id}/ (jwtAuth)
+    return request(`/api/v1/shop/orders/${id}/`, { method: "GET", auth: true });
+  },
+
   // =========================
-  // MEDIA (OpenAPI)
+  // MEDIA (OpenAPI) - security optional (jwtAuth or {})
   // =========================
   async getMediaCategories() {
-    return request("/api/v1/media/categories/", { method: "GET", auth: false });
+    const authIfToken = Boolean(getAccessToken());
+    return request("/api/v1/media/categories/", { method: "GET", auth: authIfToken });
+  },
+
+  async getMediaCategory(id) {
+    const authIfToken = Boolean(getAccessToken());
+    return request(`/api/v1/media/categories/${id}/`, { method: "GET", auth: authIfToken });
   },
 
   async getMediaItems(params = {}) {
+    const authIfToken = Boolean(getAccessToken());
     const path = buildQuery("/api/v1/media/items/", params);
-    return request(path, { method: "GET", auth: false });
+    return request(path, { method: "GET", auth: authIfToken });
   },
 
   async getMediaItem(id) {
-    return request(`/api/v1/media/items/${id}/`, { method: "GET", auth: false });
+    const authIfToken = Boolean(getAccessToken());
+    return request(`/api/v1/media/items/${id}/`, { method: "GET", auth: authIfToken });
   },
 
   // =========================
-  // NEWS (OpenAPI)
+  // NEWS (OpenAPI) - security optional (jwtAuth or {})
   // =========================
   async getNewsCategories() {
-    return request("/api/v1/news/categories/", { method: "GET", auth: false });
+    const authIfToken = Boolean(getAccessToken());
+    return request("/api/v1/news/categories/", { method: "GET", auth: authIfToken });
+  },
+
+  async getNewsCategory(id) {
+    const authIfToken = Boolean(getAccessToken());
+    return request(`/api/v1/news/categories/${id}/`, { method: "GET", auth: authIfToken });
   },
 
   async getNewsPosts(params = {}) {
+    const authIfToken = Boolean(getAccessToken());
     const path = buildQuery("/api/v1/news/posts/", params);
-    return request(path, { method: "GET", auth: false });
+    return request(path, { method: "GET", auth: authIfToken });
   },
 
   async getNewsPost(slug) {
-    return request(`/api/v1/news/posts/${slug}/`, { method: "GET", auth: false });
+    const authIfToken = Boolean(getAccessToken());
+    return request(`/api/v1/news/posts/${slug}/`, { method: "GET", auth: authIfToken });
   },
 
+  // =========================
+  // PRAYERS (OpenAPI)  <<< muhimu: plural "prayers"
+  // =========================
+  async submitPrayerRequest(payload) {
+    // POST /api/v1/prayers/requests/ (security: jwtAuth OR {})
+    // Ukikuwa una token, tuma nayo (optional) ili future backend iweze ku-link user.
+    const authIfToken = Boolean(getAccessToken());
+    return request("/api/v1/prayers/requests/", { method: "POST", body: payload, auth: authIfToken });
+  },
+
+  // admin endpoints
+  async getPrayerRequestsAdmin() {
+    // GET /api/v1/prayers/requests/ (jwtAuth)
+    return request("/api/v1/prayers/requests/", { method: "GET", auth: true });
+  },
+
+  async getPrayerRequestAdmin(id) {
+    // GET /api/v1/prayers/requests/{id}/ (jwtAuth)
+    return request(`/api/v1/prayers/requests/${id}/`, { method: "GET", auth: true });
+  },
+
+  async updatePrayerRequestStatusAdmin(id, status) {
+    // PATCH /api/v1/prayers/requests/{id}/ (jwtAuth)
+    return request(`/api/v1/prayers/requests/${id}/`, {
+      method: "PATCH",
+      body: { status },
+      auth: true,
+    });
+  },
+
+  async deletePrayerRequestAdmin(id) {
+    // DELETE /api/v1/prayers/requests/{id}/ (jwtAuth)
+    return request(`/api/v1/prayers/requests/${id}/`, { method: "DELETE", auth: true });
+  },
+
+  // =========================
+  // EVENTS / LESSONS / SEASONS (OpenAPI) - security optional (jwtAuth or {})
+  // =========================
+  async getEvents() {
+    const authIfToken = Boolean(getAccessToken());
+    return request("/events/", { method: "GET", auth: authIfToken });
+  },
+
+  async getEvent(slug) {
+    const authIfToken = Boolean(getAccessToken());
+    return request(`/events/${slug}/`, { method: "GET", auth: authIfToken });
+  },
+
+  async getLessons() {
+    const authIfToken = Boolean(getAccessToken());
+    return request("/lessons/", { method: "GET", auth: authIfToken });
+  },
+
+  async getLesson(slug) {
+    const authIfToken = Boolean(getAccessToken());
+    return request(`/lessons/${slug}/`, { method: "GET", auth: authIfToken });
+  },
+
+  async getSeasons() {
+    const authIfToken = Boolean(getAccessToken());
+    return request("/seasons/", { method: "GET", auth: authIfToken });
+  },
+
+  async getSeason(slug) {
+    const authIfToken = Boolean(getAccessToken());
+    return request(`/seasons/${slug}/`, { method: "GET", auth: authIfToken });
+  },
+
+  // =========================
+  // MANAGE (admin) - jwtAuth
+  // =========================
+  async manageListEvents() {
+    return request("/manage/events/", { method: "GET", auth: true });
+  },
+  async manageCreateEvent(payload) {
+    return request("/manage/events/", { method: "POST", body: payload, auth: true });
+  },
+  async manageGetEvent(public_id) {
+    return request(`/manage/events/${public_id}/`, { method: "GET", auth: true });
+  },
+  async managePutEvent(public_id, payload) {
+    return request(`/manage/events/${public_id}/`, { method: "PUT", body: payload, auth: true });
+  },
+  async managePatchEvent(public_id, payload) {
+    return request(`/manage/events/${public_id}/`, { method: "PATCH", body: payload, auth: true });
+  },
+  async manageDeleteEvent(public_id) {
+    return request(`/manage/events/${public_id}/`, { method: "DELETE", auth: true });
+  },
+
+  async manageListLessons() {
+    return request("/manage/lessons/", { method: "GET", auth: true });
+  },
+  async manageCreateLesson(payload) {
+    return request("/manage/lessons/", { method: "POST", body: payload, auth: true });
+  },
+  async manageGetLesson(public_id) {
+    return request(`/manage/lessons/${public_id}/`, { method: "GET", auth: true });
+  },
+  async managePutLesson(public_id, payload) {
+    return request(`/manage/lessons/${public_id}/`, { method: "PUT", body: payload, auth: true });
+  },
+  async managePatchLesson(public_id, payload) {
+    return request(`/manage/lessons/${public_id}/`, { method: "PATCH", body: payload, auth: true });
+  },
+  async manageDeleteLesson(public_id) {
+    return request(`/manage/lessons/${public_id}/`, { method: "DELETE", auth: true });
+  },
 };
 
 export default api;

@@ -1,9 +1,9 @@
 // src/pages/prayer/PrayerRequests.jsx
-import { useState } from 'react';
-import { useTheme } from '../../contexts/ThemeContext';
-import { isValidEmail, isValidPhone } from '../../utils/helpers';
-import apiService from '../../services/api';
-import SEOHead from '../../components/SEOHead';
+import { useEffect, useState } from "react";
+import { useTheme } from "../../contexts/ThemeContext";
+import { isValidEmail, isValidPhone } from "../../utils/helpers";
+import apiService from "../../services/api";
+import SEOHead from "../../components/SEOHead";
 import {
   Heart,
   Send,
@@ -12,38 +12,93 @@ import {
   Clock,
   Shield,
   AlertCircle,
-} from 'lucide-react';
+  UserCircle2,
+} from "lucide-react";
 
 export default function PrayerRequests() {
   const { isDark } = useTheme();
+
+  const [account, setAccount] = useState({ name: "", email: "", phone: "" });
+  const [loadingAccount, setLoadingAccount] = useState(false);
+
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    request: '',
-    category: 'personal',
+    name: "",
+    email: "",
+    phone: "",
+    request: "",
+    category: "personal",
     anonymous: false,
     urgent: false,
   });
+
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState(null);
 
+  const isLoggedIn = Boolean(apiService.getAccessToken?.());
+
+  // Auto-fill kutoka /api/v1/auth/me/ (OpenAPI: User schema)
+  useEffect(() => {
+    let mounted = true;
+
+    const loadMe = async () => {
+      if (!isLoggedIn) return;
+
+      setLoadingAccount(true);
+      try {
+        const me = await apiService.getMe();
+
+        const fullName =
+          [me?.first_name, me?.last_name].filter(Boolean).join(" ").trim() ||
+          (me?.username ? String(me.username) : "");
+
+        const email = me?.email ? String(me.email) : "";
+        const phone = me?.phone ? String(me.phone) : "";
+
+        if (!mounted) return;
+
+        const normalized = { name: fullName, email, phone };
+        setAccount(normalized);
+
+        setFormData((prev) => ({
+          ...prev,
+          name: normalized.name || prev.name,
+          email: normalized.email || prev.email,
+          phone: normalized.phone || prev.phone,
+        }));
+      } catch {
+        // api.js itajaribu refresh ikiwa token ime-expire.
+      } finally {
+        if (mounted) setLoadingAccount(false);
+      }
+    };
+
+    loadMe();
+    return () => {
+      mounted = false;
+    };
+  }, [isLoggedIn]);
+
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.anonymous && !formData.name.trim()) {
-      newErrors.name = 'Jina ni lazima kama hutumii anonymous.';
+
+    if (!formData.anonymous && !String(formData.name || "").trim()) {
+      newErrors.name = "Jina ni lazima kama hutumii anonymous.";
     }
+
     if (formData.email && !isValidEmail(formData.email)) {
-      newErrors.email = 'Barua pepe si sahihi.';
+      newErrors.email = "Barua pepe si sahihi.";
     }
+
     if (formData.phone && !isValidPhone(formData.phone)) {
-      newErrors.phone = 'Nambari ya simu si sahihi.';
+      newErrors.phone = "Nambari ya simu si sahihi.";
     }
-    if (!formData.request.trim()) {
-      newErrors.request = 'Ombi ni lazima.';
+
+    if (!String(formData.request || "").trim()) {
+      newErrors.request = "Ombi ni lazima.";
     }
+
     return newErrors;
   };
 
@@ -62,35 +117,36 @@ export default function PrayerRequests() {
 
     try {
       await apiService.submitPrayerRequest({
-        name: formData.anonymous ? '' : formData.name,
-        email: formData.email,
-        phone: formData.phone,
+        name: formData.anonymous ? "" : String(formData.name || "").trim(),
+        email: String(formData.email || "").trim(),
+        phone: String(formData.phone || "").trim(),
         category: formData.category,
-        request: formData.request,
-        is_anonymous: formData.anonymous,
-        is_urgent: formData.urgent,
+        request: String(formData.request || "").trim(),
+        is_anonymous: Boolean(formData.anonymous),
+        is_urgent: Boolean(formData.urgent),
       });
 
       setSubmitted(true);
 
-      // Reset baada ya sekunde chache
       setTimeout(() => {
         setSubmitted(false);
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          request: '',
-          category: 'personal',
+        setFormData((prev) => ({
+          ...prev,
+          request: "",
+          category: "personal",
           anonymous: false,
           urgent: false,
-        });
-      }, 3000);
+          // keep autofill kwa aliye-login
+          name: isLoggedIn ? account.name : "",
+          email: isLoggedIn ? account.email : "",
+          phone: isLoggedIn ? account.phone : "",
+        }));
+      }, 2500);
     } catch (error) {
       const msg =
-        error?.message && typeof error.message === 'string'
+        error?.message && typeof error.message === "string"
           ? error.message
-          : 'Hitilafu katika kutuma ombi. Jaribu tena.';
+          : "Hitilafu katika kutuma ombi. Jaribu tena.";
       setSubmitError(msg);
     } finally {
       setLoading(false);
@@ -101,26 +157,22 @@ export default function PrayerRequests() {
     const { name, value, type, checked } = e.target;
 
     setFormData((prev) => {
-      // handle anonymous special case
-      if (name === 'anonymous') {
-        const next = {
-          ...prev,
-          anonymous: checked,
-        };
-        // ukichagua anonymous, futa jina (hiari) na error ya jina
+      if (name === "anonymous") {
+        const next = { ...prev, anonymous: checked };
         if (checked) {
-          next.name = '';
+          next.name = "";
+        } else if (isLoggedIn && !String(next.name || "").trim()) {
+          next.name = account.name || "";
         }
         return next;
       }
 
       return {
         ...prev,
-        [name]: type === 'checkbox' ? checked : value,
+        [name]: type === "checkbox" ? checked : value,
       };
     });
 
-    // futa error ya field husika mara mtu akianza ku-edit
     setErrors((prev) => {
       if (!prev[name]) return prev;
       const copy = { ...prev };
@@ -139,51 +191,47 @@ export default function PrayerRequests() {
         <div
           className={`min-h-screen py-12 transition-colors ${
             isDark
-              ? 'bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950'
-              : 'bg-gradient-to-b from-slate-50 via-white to-emerald-50'
+              ? "bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950"
+              : "bg-gradient-to-b from-slate-50 via-white to-emerald-50"
           }`}
         >
           <div className="container mx-auto px-4 md:px-6">
             <div
               className={`max-w-2xl mx-auto text-center rounded-2xl border p-8 md:p-12 shadow-lg ${
                 isDark
-                  ? 'bg-gray-900/90 border-gray-800'
-                  : 'bg-white border-gray-100'
+                  ? "bg-gray-900/90 border-gray-800"
+                  : "bg-white border-gray-100"
               }`}
             >
-              <CheckCircle
-                className="text-emerald-500 mx-auto mb-6"
-                size={64}
-              />
+              <CheckCircle className="text-emerald-500 mx-auto mb-6" size={64} />
               <h1
                 className={`text-2xl md:text-3xl font-bold mb-4 ${
-                  isDark ? 'text-white' : 'text-gray-900'
+                  isDark ? "text-white" : "text-gray-900"
                 }`}
               >
                 Ombi Lako Limepokewa!
               </h1>
               <p
                 className={`text-sm md:text-lg mb-6 ${
-                  isDark ? 'text-gray-300' : 'text-gray-600'
+                  isDark ? "text-gray-300" : "text-gray-600"
                 }`}
               >
-                Asante kwa kutuamini na ombi lako. Timu yetu ya maombi
-                itaomba kwa ajili yako. Mungu akusikie na akujibu kwa wakati
-                wake kamili.
+                Asante. Timu yetu ya maombi itaomba kwa ajili yako. Mungu akusikie
+                na akujibu kwa wakati wake kamili.
               </p>
+
               <div
                 className={`p-4 rounded-lg mb-6 ${
                   isDark
-                    ? 'bg-emerald-900/20 border border-emerald-800'
-                    : 'bg-emerald-50 border border-emerald-200'
+                    ? "bg-emerald-900/20 border border-emerald-800"
+                    : "bg-emerald-50 border border-emerald-200"
                 }`}
               >
                 <p className="text-emerald-700 dark:text-emerald-300 text-sm md:text-base font-medium">
-                  "Msiwe na wasiwasi juu ya chochote, bali katika kila jambo,
-                  kwa maombi na dua, pamoja na shukrani, mjulishe Mungu mahitaji
-                  yenu." – Wafilipi 4:6
+                  "Msiwe na wasiwasi juu ya chochote..." – Wafilipi 4:6
                 </p>
               </div>
+
               <button
                 onClick={() => setSubmitted(false)}
                 className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 md:px-8 py-3 rounded-lg font-semibold text-sm md:text-base transition-colors"
@@ -197,56 +245,56 @@ export default function PrayerRequests() {
     );
   }
 
+  const showProfileCard = isLoggedIn && !formData.anonymous;
+
   return (
     <>
       <SEOHead
         title="Maombi ya Pamoja"
-        description="Tuma ombi lako na tuombe pamoja kama jamii ya imani. Hakuna ombi dogo au kubwa - Mungu anasikia yote."
+        description="Tuma ombi lako na tuombe pamoja kama jamii ya imani."
         keywords="maombi, ombi, prayer, imani, jamii, kiroho"
       />
+
       <div
         className={`min-h-screen py-10 md:py-12 transition-colors ${
           isDark
-            ? 'bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950'
-            : 'bg-gradient-to-b from-slate-50 via-white to-emerald-50'
+            ? "bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950"
+            : "bg-gradient-to-b from-slate-50 via-white to-emerald-50"
         }`}
       >
         <div className="container mx-auto px-4 md:px-6">
-          {/* Header */}
           <header className="text-center mb-10 md:mb-12">
             <div className="w-16 h-16 bg-gradient-to-r from-emerald-500 via-sky-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-md shadow-emerald-400/50">
               <Heart className="text-white" size={32} />
             </div>
             <h1
               className={`text-2xl md:text-4xl font-extrabold mb-3 ${
-                isDark ? 'text-white' : 'text-gray-900'
+                isDark ? "text-white" : "text-gray-900"
               }`}
             >
               Maombi ya Pamoja
             </h1>
             <p
               className={`text-sm md:text-lg max-w-2xl mx-auto ${
-                isDark ? 'text-gray-300' : 'text-gray-600'
+                isDark ? "text-gray-300" : "text-gray-600"
               }`}
             >
-              Tuma ombi lako na tuombe pamoja kama jamii ya imani. Hakuna ombi
-              dogo au kubwa – Mungu anasikia yote.
+              Tuma ombi lako na tuombe pamoja kama jamii ya imani.
             </p>
           </header>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Form */}
             <div className="lg:col-span-2">
               <div
                 className={`rounded-2xl border shadow-lg p-6 md:p-8 ${
                   isDark
-                    ? 'bg-gray-900/90 border-gray-800'
-                    : 'bg-white border-gray-100'
+                    ? "bg-gray-900/90 border-gray-800"
+                    : "bg-white border-gray-100"
                 }`}
               >
                 <h2
                   className={`text-lg md:text-2xl font-bold mb-4 md:mb-6 ${
-                    isDark ? 'text-white' : 'text-gray-900'
+                    isDark ? "text-white" : "text-gray-900"
                   }`}
                 >
                   Tuma Ombi Lako
@@ -259,108 +307,138 @@ export default function PrayerRequests() {
                   </div>
                 )}
 
-                <form
-                  onSubmit={handleSubmit}
-                  className="space-y-5 md:space-y-6"
-                >
-                  {/* Personal info */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label
-                        className={`block text-xs md:text-sm font-medium mb-2 ${
-                          isDark ? 'text-gray-300' : 'text-gray-700'
+                {showProfileCard && (
+                  <div
+                    className={`mb-5 rounded-2xl border p-4 md:p-5 ${
+                      isDark
+                        ? "bg-gray-900/60 border-gray-800"
+                        : "bg-emerald-50/60 border-emerald-200"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <UserCircle2
+                        size={18}
+                        className={isDark ? "text-emerald-300" : "text-emerald-700"}
+                      />
+                      <p
+                        className={`text-xs md:text-sm font-semibold ${
+                          isDark ? "text-gray-100" : "text-gray-900"
                         }`}
                       >
-                        Jina Lako{' '}
-                        {!formData.anonymous && (
-                          <span className="text-red-500">*</span>
-                        )}
-                      </label>
-                      <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        disabled={formData.anonymous}
-                        className={`w-full px-3 md:px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-                          errors.name ? 'border-red-500' : ''
-                        } ${
-                          isDark
-                            ? 'bg-gray-800 border-gray-700 text-white disabled:bg-gray-700'
-                            : 'bg-white border-gray-300 text-gray-900 disabled:bg-gray-100'
-                        }`}
-                        placeholder="Jina lako kamili"
-                      />
-                      {errors.name && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.name}
-                        </p>
+                        Taarifa zako (auto)
+                      </p>
+                      {loadingAccount && (
+                        <span className="text-[11px] text-gray-400">inapakia...</span>
                       )}
                     </div>
-                    <div>
-                      <label
-                        className={`block text-xs md:text-sm font-medium mb-2 ${
-                          isDark ? 'text-gray-300' : 'text-gray-700'
-                        }`}
-                      >
-                        Barua Pepe
-                      </label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className={`w-full px-3 md:px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-                          errors.email ? 'border-red-500' : ''
-                        } ${
-                          isDark
-                            ? 'bg-gray-800 border-gray-700 text-white'
-                            : 'bg-white border-gray-300 text-gray-900'
-                        }`}
-                        placeholder="email@example.com"
-                      />
-                      {errors.email && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.email}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label
-                      className={`block text-xs md:text-sm font-medium mb-2 ${
-                        isDark ? 'text-gray-300' : 'text-gray-700'
+                    <div
+                      className={`text-xs md:text-sm ${
+                        isDark ? "text-gray-300" : "text-gray-700"
                       }`}
                     >
-                      Nambari ya Simu
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className={`w-full px-3 md:px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-                        errors.phone ? 'border-red-500' : ''
-                      } ${
-                        isDark
-                          ? 'bg-gray-800 border-gray-700 text-white'
-                          : 'bg-white border-gray-300 text-gray-900'
-                      }`}
-                      placeholder="+255 xxx xxx xxx"
-                    />
-                    {errors.phone && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.phone}
-                      </p>
-                    )}
+                      <div>
+                        <span className="font-semibold">Jina:</span>{" "}
+                        {formData.name || "-"}
+                      </div>
+                      <div>
+                        <span className="font-semibold">Email:</span>{" "}
+                        {formData.email || "-"}
+                      </div>
+                      <div>
+                        <span className="font-semibold">Simu:</span>{" "}
+                        {formData.phone || "-"}
+                      </div>
+                    </div>
                   </div>
+                )}
 
-                  {/* Category */}
+                <form onSubmit={handleSubmit} className="space-y-5 md:space-y-6">
+                  {!isLoggedIn && (
+                    <>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label
+                            className={`block text-xs md:text-sm font-medium mb-2 ${
+                              isDark ? "text-gray-300" : "text-gray-700"
+                            }`}
+                          >
+                            Jina Lako {!formData.anonymous && <span className="text-red-500">*</span>}
+                          </label>
+                          <input
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            disabled={formData.anonymous}
+                            className={`w-full px-3 md:px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+                              errors.name ? "border-red-500" : ""
+                            } ${
+                              isDark
+                                ? "bg-gray-800 border-gray-700 text-white disabled:bg-gray-700"
+                                : "bg-white border-gray-300 text-gray-900 disabled:bg-gray-100"
+                            }`}
+                            placeholder="Jina lako kamili"
+                          />
+                          {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+                        </div>
+
+                        <div>
+                          <label
+                            className={`block text-xs md:text-sm font-medium mb-2 ${
+                              isDark ? "text-gray-300" : "text-gray-700"
+                            }`}
+                          >
+                            Barua Pepe
+                          </label>
+                          <input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            className={`w-full px-3 md:px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+                              errors.email ? "border-red-500" : ""
+                            } ${
+                              isDark
+                                ? "bg-gray-800 border-gray-700 text-white"
+                                : "bg-white border-gray-300 text-gray-900"
+                            }`}
+                            placeholder="email@example.com"
+                          />
+                          {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label
+                          className={`block text-xs md:text-sm font-medium mb-2 ${
+                            isDark ? "text-gray-300" : "text-gray-700"
+                          }`}
+                        >
+                          Nambari ya Simu
+                        </label>
+                        <input
+                          type="tel"
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleChange}
+                          className={`w-full px-3 md:px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+                            errors.phone ? "border-red-500" : ""
+                          } ${
+                            isDark
+                              ? "bg-gray-800 border-gray-700 text-white"
+                              : "bg-white border-gray-300 text-gray-900"
+                          }`}
+                          placeholder="+255 xxx xxx xxx"
+                        />
+                        {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+                      </div>
+                    </>
+                  )}
+
                   <div>
                     <label
                       className={`block text-xs md:text-sm font-medium mb-2 ${
-                        isDark ? 'text-gray-300' : 'text-gray-700'
+                        isDark ? "text-gray-300" : "text-gray-700"
                       }`}
                     >
                       Aina ya Ombi <span className="text-red-500">*</span>
@@ -371,8 +449,8 @@ export default function PrayerRequests() {
                       onChange={handleChange}
                       className={`w-full px-3 md:px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                         isDark
-                          ? 'bg-gray-800 border-gray-700 text-white'
-                          : 'bg-white border-gray-300 text-gray-900'
+                          ? "bg-gray-800 border-gray-700 text-white"
+                          : "bg-white border-gray-300 text-gray-900"
                       }`}
                     >
                       <option value="personal">Binafsi</option>
@@ -385,11 +463,10 @@ export default function PrayerRequests() {
                     </select>
                   </div>
 
-                  {/* Request */}
                   <div>
                     <label
                       className={`block text-xs md:text-sm font-medium mb-2 ${
-                        isDark ? 'text-gray-300' : 'text-gray-700'
+                        isDark ? "text-gray-300" : "text-gray-700"
                       }`}
                     >
                       Ombi Lako <span className="text-red-500">*</span>
@@ -400,22 +477,17 @@ export default function PrayerRequests() {
                       onChange={handleChange}
                       rows={6}
                       className={`w-full px-3 md:px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-                        errors.request ? 'border-red-500' : ''
+                        errors.request ? "border-red-500" : ""
                       } ${
                         isDark
-                          ? 'bg-gray-800 border-gray-700 text-white'
-                          : 'bg-white border-gray-300 text-gray-900'
+                          ? "bg-gray-800 border-gray-700 text-white"
+                          : "bg-white border-gray-300 text-gray-900"
                       }`}
-                      placeholder="Andika ombi lako hapa... Mungu anasikia kila neno la moyo wako."
+                      placeholder="Andika ombi lako hapa..."
                     />
-                    {errors.request && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.request}
-                      </p>
-                    )}
+                    {errors.request && <p className="text-red-500 text-xs mt-1">{errors.request}</p>}
                   </div>
 
-                  {/* Options */}
                   <div className="space-y-3">
                     <div className="flex items-center">
                       <input
@@ -429,12 +501,13 @@ export default function PrayerRequests() {
                       <label
                         htmlFor="anonymous"
                         className={`ml-2 text-xs md:text-sm ${
-                          isDark ? 'text-gray-300' : 'text-gray-700'
+                          isDark ? "text-gray-300" : "text-gray-700"
                         }`}
                       >
                         Tuma bila kutaja jina (Anonymous)
                       </label>
                     </div>
+
                     <div className="flex items-center">
                       <input
                         type="checkbox"
@@ -447,15 +520,14 @@ export default function PrayerRequests() {
                       <label
                         htmlFor="urgent"
                         className={`ml-2 text-xs md:text-sm ${
-                          isDark ? 'text-gray-300' : 'text-gray-700'
+                          isDark ? "text-gray-300" : "text-gray-700"
                         }`}
                       >
-                        Ombi la haraka (Urgent)
+                        Special Prayer (Haraka / Kipaumbele)
                       </label>
                     </div>
                   </div>
 
-                  {/* Submit */}
                   <button
                     type="submit"
                     disabled={loading}
@@ -477,114 +549,64 @@ export default function PrayerRequests() {
               </div>
             </div>
 
-            {/* Sidebar */}
             <div className="space-y-6">
-              {/* Guidelines */}
               <div
                 className={`rounded-2xl border p-5 ${
-                  isDark
-                    ? 'bg-gray-900/90 border-gray-800'
-                    : 'bg-white border-gray-100'
+                  isDark ? "bg-gray-900/90 border-gray-800" : "bg-white border-gray-100"
                 }`}
               >
-                <h3
-                  className={`text-base md:text-lg font-semibold mb-3 ${
-                    isDark ? 'text-white' : 'text-gray-900'
-                  }`}
-                >
+                <h3 className={`text-base md:text-lg font-semibold mb-3 ${isDark ? "text-white" : "text-gray-900"}`}>
                   Miongozo ya Maombi
                 </h3>
-                <ul
-                  className={`space-y-2 text-xs md:text-sm ${
-                    isDark ? 'text-gray-300' : 'text-gray-600'
-                  }`}
-                >
+                <ul className={`space-y-2 text-xs md:text-sm ${isDark ? "text-gray-300" : "text-gray-600"}`}>
                   <li className="flex items-start">
-                    <Heart
-                      className="text-emerald-500 mr-2 mt-0.5 flex-shrink-0"
-                      size={16}
-                    />
+                    <Heart className="text-emerald-500 mr-2 mt-0.5 flex-shrink-0" size={16} />
                     Omba kwa moyo wa uwazi na imani.
                   </li>
                   <li className="flex items-start">
-                    <Shield
-                      className="text-emerald-500 mr-2 mt-0.5 flex-shrink-0"
-                      size={16}
-                    />
+                    <Shield className="text-emerald-500 mr-2 mt-0.5 flex-shrink-0" size={16} />
                     Maombi yako yanahifadhiwa kwa siri na usalama.
                   </li>
                   <li className="flex items-start">
-                    <Users
-                      className="text-emerald-500 mr-2 mt-0.5 flex-shrink-0"
-                      size={16}
-                    />
+                    <Users className="text-emerald-500 mr-2 mt-0.5 flex-shrink-0" size={16} />
                     Timu yetu ya maombi itaombea ombi lako.
                   </li>
                   <li className="flex items-start">
-                    <Clock
-                      className="text-emerald-500 mr-2 mt-0.5 flex-shrink-0"
-                      size={16}
-                    />
-                    Maombi ya haraka yanapewa kipaumbele maalum.
+                    <Clock className="text-emerald-500 mr-2 mt-0.5 flex-shrink-0" size={16} />
+                    Maombi ya haraka yanapewa kipaumbele.
                   </li>
                 </ul>
               </div>
 
-              {/* Verse */}
               <div
                 className={`rounded-2xl p-5 border ${
-                  isDark
-                    ? 'bg-emerald-900/20 border-emerald-800'
-                    : 'bg-emerald-50 border-emerald-200'
+                  isDark ? "bg-emerald-900/20 border-emerald-800" : "bg-emerald-50 border-emerald-200"
                 }`}
               >
                 <blockquote className="text-emerald-700 dark:text-emerald-200 text-sm md:text-base font-medium mb-2">
-                  "Msiwe na wasiwasi juu ya chochote, bali katika kila jambo,
-                  kwa maombi na dua, pamoja na shukrani, mjulishe Mungu mahitaji
-                  yenu."
+                  "Msiwe na wasiwasi juu ya chochote, bali katika kila jambo, kwa maombi na dua..."
                 </blockquote>
-                <cite className="text-emerald-600 dark:text-emerald-300 text-xs md:text-sm">
-                  – Wafilipi 4:6
-                </cite>
+                <cite className="text-emerald-600 dark:text-emerald-300 text-xs md:text-sm">– Wafilipi 4:6</cite>
               </div>
 
-              {/* Urgent contact */}
               <div
                 className={`rounded-2xl border p-5 ${
-                  isDark
-                    ? 'bg-gray-900/90 border-gray-800'
-                    : 'bg-white border-gray-100'
+                  isDark ? "bg-gray-900/90 border-gray-800" : "bg-white border-gray-100"
                 }`}
               >
-                <h3
-                  className={`text-base md:text-lg font-semibold mb-3 ${
-                    isDark ? 'text-white' : 'text-gray-900'
-                  }`}
-                >
+                <h3 className={`text-base md:text-lg font-semibold mb-3 ${isDark ? "text-white" : "text-gray-900"}`}>
                   Maombi ya Haraka Sana
                 </h3>
-                <p
-                  className={`text-xs md:text-sm mb-3 ${
-                    isDark ? 'text-gray-300' : 'text-gray-600'
-                  }`}
-                >
-                  Kwa maombi ya haraka sana, unaweza kuwasiliana nasi moja kwa
-                  moja:
+                <p className={`text-xs md:text-sm mb-3 ${isDark ? "text-gray-300" : "text-gray-600"}`}>
+                  Kwa maombi ya haraka sana, unaweza kuwasiliana nasi moja kwa moja:
                 </p>
                 <div className="space-y-2 text-xs md:text-sm">
-                  <div
-                    className={isDark ? 'text-gray-300' : 'text-gray-700'}
-                  >
-                    📞 +255 767 525 234
-                  </div>
-                  <div
-                    className={isDark ? 'text-gray-300' : 'text-gray-700'}
-                  >
-                    ✉️ fmklink@gmail.com
-                  </div>
+                  <div className={isDark ? "text-gray-300" : "text-gray-700"}>📞 +255 767 525 234</div>
+                  <div className={isDark ? "text-gray-300" : "text-gray-700"}>✉️ fmklink@gmail.com</div>
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </div>
