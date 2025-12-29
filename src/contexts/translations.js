@@ -259,6 +259,33 @@ export const translations = {
     paginationPrev: "Nyuma",
     paginationNext: "Mbele",
 
+    // NEWS DETAIL (sw)
+    newsDetailSeoLoadingTitle: "Makala | Habari",
+    newsDetailSeoLoadingDesc: "Inapakia makala...",
+    newsDetailSeoNotFoundTitle: "Makala Haijapatikana",
+    newsDetailSeoNotFoundDesc: "Taarifa za makala hazikupatikana.",
+    newsDetailSeoPostSuffix: "Habari",
+
+    newsDetailLoading: "Inapakia makala...",
+    newsDetailError: "Hitilafu katika kupakia makala.",
+    newsDetailNotFound: "Makala haijapatikana",
+    newsDetailNotFoundFallback: "Makala haijapatikana",
+
+    newsDetailBackToNews: "Rudi kwenye Habari",
+    newsDetailNoImage: "Hakuna Picha",
+
+    newsDetailShareLabel: "Shiriki:",
+    newsDetailRelatedTitle: "Makala Zinazohusiana",
+    newsDetailSummaryTitle: "Muhtasari",
+
+    newsDetailLabelCategory: "Kundi",
+    newsDetailLabelAuthor: "Mwandishi",
+    newsDetailLabelDate: "Tarehe",
+    newsDetailLabelViews: "Views",
+
+    newsDetailViewsSuffix: "mara",
+    newsDetailReadTimeText: "min kusoma",
+
   },
 
   en: {
@@ -519,6 +546,33 @@ export const translations = {
 
     paginationPrev: "Previous",
     paginationNext: "Next",
+
+    // NEWS DETAIL (en)
+    newsDetailSeoLoadingTitle: "Article | News",
+    newsDetailSeoLoadingDesc: "Loading article...",
+    newsDetailSeoNotFoundTitle: "Article Not Found",
+    newsDetailSeoNotFoundDesc: "Article details were not found.",
+    newsDetailSeoPostSuffix: "News",
+
+    newsDetailLoading: "Loading article...",
+    newsDetailError: "Failed to load article.",
+    newsDetailNotFound: "Article not found",
+    newsDetailNotFoundFallback: "Article not found",
+
+    newsDetailBackToNews: "Back to News",
+    newsDetailNoImage: "No Image",
+
+    newsDetailShareLabel: "Share:",
+    newsDetailRelatedTitle: "Related Articles",
+    newsDetailSummaryTitle: "Summary",
+
+    newsDetailLabelCategory: "Category",
+    newsDetailLabelAuthor: "Author",
+    newsDetailLabelDate: "Date",
+    newsDetailLabelViews: "Views",
+
+    newsDetailViewsSuffix: "views",
+    newsDetailReadTimeText: "min read",
 
   }
 };

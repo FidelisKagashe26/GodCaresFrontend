@@ -2,19 +2,36 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useTheme } from "../../contexts/ThemeContext";
+import { useLanguage } from "../../contexts/LanguageContext";
 import SEOHead from "../../components/SEOHead";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import apiService from "../../services/api";
-import { Calendar, User, Eye, ArrowLeft, Clock, AlertCircle } from "lucide-react";
+import { User, Eye, ArrowLeft, Clock, AlertCircle } from "lucide-react";
 
-function SmartImage({ src, alt, isDark, heightClass = "h-56 md:h-72 lg:h-80", roundedClass = "rounded-2xl" }) {
+function SmartImage({
+  src,
+  alt,
+  isDark,
+  noImageText,
+  heightClass = "h-56 md:h-72 lg:h-80",
+  roundedClass = "rounded-2xl",
+}) {
   const [broken, setBroken] = useState(false);
 
   return (
-    <div className={`relative w-full ${heightClass} overflow-hidden ${roundedClass} ${isDark ? "bg-gray-900" : "bg-slate-100"}`}>
+    <div
+      className={`relative w-full ${heightClass} overflow-hidden ${roundedClass} ${
+        isDark ? "bg-gray-900" : "bg-slate-100"
+      }`}
+    >
       {src && !broken ? (
         <>
-          <img src={src} alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-55" />
+          <img
+            src={src}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-55"
+          />
           <img
             src={src}
             alt={alt}
@@ -26,7 +43,9 @@ function SmartImage({ src, alt, isDark, heightClass = "h-56 md:h-72 lg:h-80", ro
         </>
       ) : (
         <div className="w-full h-full flex items-center justify-center">
-          <div className={`text-sm ${isDark ? "text-gray-500" : "text-gray-400"}`}>No Image</div>
+          <div className={`text-sm ${isDark ? "text-gray-500" : "text-gray-400"}`}>
+            {noImageText}
+          </div>
         </div>
       )}
     </div>
@@ -36,6 +55,7 @@ function SmartImage({ src, alt, isDark, heightClass = "h-56 md:h-72 lg:h-80", ro
 export default function NewsDetail() {
   const { slug } = useParams();
   const { isDark } = useTheme();
+  const { language, t } = useLanguage();
 
   const [post, setPost] = useState(null);
   const [related, setRelated] = useState([]);
@@ -45,7 +65,8 @@ export default function NewsDetail() {
   const formatDate = (value) => {
     if (!value) return "";
     const d = new Date(value);
-    return d.toLocaleDateString("sw-TZ", { year: "numeric", month: "long", day: "numeric" });
+    const loc = language === "sw" ? "sw-TZ" : "en-US";
+    return d.toLocaleDateString(loc, { year: "numeric", month: "long", day: "numeric" });
   };
 
   useEffect(() => {
@@ -65,7 +86,7 @@ export default function NewsDetail() {
         setRelated(Array.isArray(data?.related_posts) ? data.related_posts : []);
       } catch (err) {
         if (!mounted) return;
-        setError(err?.message || "Hitilafu katika kupakia makala.");
+        setError(err?.message || t("newsDetailError"));
       } finally {
         if (mounted) setLoading(false);
       }
@@ -75,29 +96,60 @@ export default function NewsDetail() {
     return () => {
       mounted = false;
     };
-  }, [slug]);
+  }, [slug, t]);
 
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
   const shareText = post ? `${post.title} - GOD CARES 365` : "";
 
-  const safeCategoryName = post?.category?.name || "Bila Kundi";
+  // tumia key iliyopo (kutoka News.jsx) ili iwe consistent
+  const safeCategoryName = post?.category?.name || t("newsNoCategory");
 
   const readTime = useMemo(() => {
     const rt = Number(post?.read_time || 0);
     return rt > 0 ? rt : null;
   }, [post]);
 
+  // SEO
+  const seoLoadingTitle = t("newsDetailSeoLoadingTitle");
+  const seoLoadingDesc = t("newsDetailSeoLoadingDesc");
+
+  const seoNotFoundTitle = t("newsDetailSeoNotFoundTitle");
+  const seoNotFoundDesc = t("newsDetailSeoNotFoundDesc");
+
+  const seoPostSuffix = t("newsDetailSeoPostSuffix");
+  const seoPostDesc = (post?.excerpt || "").slice(0, 150);
+
+  const noImageText = t("newsDetailNoImage");
+  const backToNewsText = t("newsDetailBackToNews");
+
+  const shareLabel = t("newsDetailShareLabel");
+  const relatedTitle = t("newsDetailRelatedTitle");
+  const summaryTitle = t("newsDetailSummaryTitle");
+
+  const labelCategory = t("newsDetailLabelCategory");
+  const labelAuthor = t("newsDetailLabelAuthor");
+  const labelDate = t("newsDetailLabelDate");
+  const labelViews = t("newsDetailLabelViews");
+
+  const viewsSuffix = t("newsDetailViewsSuffix");
+  const readTimeText = t("newsDetailReadTimeText");
+
+  const notFoundText = t("newsDetailNotFound");
+  const fallbackErrorText = t("newsDetailNotFoundFallback");
+
   if (loading) {
     return (
       <>
-        <SEOHead title="Makala | Habari" description="Inapakia makala..." />
+        <SEOHead title={seoLoadingTitle} description={seoLoadingDesc} />
         <div
           className={`min-h-screen py-12 transition-colors ${
-            isDark ? "bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950" : "bg-gradient-to-b from-slate-50 via-white to-emerald-50"
+            isDark
+              ? "bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950"
+              : "bg-gradient-to-b from-slate-50 via-white to-emerald-50"
           }`}
         >
           <div className="container mx-auto px-4 md:px-6 flex items-center justify-center min-h-[420px]">
-            <LoadingSpinner text="Inapakia makala..." size="lg" />
+            <LoadingSpinner text={t("newsDetailLoading")} size="lg" />
           </div>
         </div>
       </>
@@ -107,22 +159,34 @@ export default function NewsDetail() {
   if (error || !post) {
     return (
       <>
-        <SEOHead title="Makala Haijapatikana" description="Taarifa za makala hazikupatikana." />
+        <SEOHead title={seoNotFoundTitle} description={seoNotFoundDesc} />
         <div
           className={`min-h-screen py-12 transition-colors ${
-            isDark ? "bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950" : "bg-gradient-to-b from-slate-50 via-white to-emerald-50"
+            isDark
+              ? "bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950"
+              : "bg-gradient-to-b from-slate-50 via-white to-emerald-50"
           }`}
         >
           <div className="container mx-auto px-4 md:px-6">
-            <div className={`text-center rounded-2xl border px-6 py-10 ${isDark ? "bg-gray-900/85 border-gray-800" : "bg-white/95 border-gray-100"}`}>
-              <AlertCircle className={isDark ? "text-rose-300 mx-auto mb-3" : "text-rose-600 mx-auto mb-3"} size={40} />
-              <p className="text-red-600 text-base md:text-lg">{error || "Makala haijapatikana"}</p>
+            <div
+              className={`text-center rounded-2xl border px-6 py-10 ${
+                isDark ? "bg-gray-900/85 border-gray-800" : "bg-white/95 border-gray-100"
+              }`}
+            >
+              <AlertCircle
+                className={isDark ? "text-rose-300 mx-auto mb-3" : "text-rose-600 mx-auto mb-3"}
+                size={40}
+              />
+              <p className="text-red-600 text-base md:text-lg">
+                {error || notFoundText || fallbackErrorText}
+              </p>
+
               <Link
                 to="/habari"
                 className="inline-flex items-center mt-4 text-emerald-600 hover:text-emerald-700 dark:text-emerald-300 text-sm font-semibold"
               >
                 <ArrowLeft size={16} className="mr-1" />
-                Rudi kwenye Habari
+                {backToNewsText}
               </Link>
             </div>
           </div>
@@ -133,11 +197,13 @@ export default function NewsDetail() {
 
   return (
     <>
-      <SEOHead title={`${post.title} | Habari`} description={(post.excerpt || "").slice(0, 150)} />
+      <SEOHead title={`${post.title} | ${seoPostSuffix}`} description={seoPostDesc} />
 
       <div
         className={`min-h-screen py-10 md:py-12 transition-colors ${
-          isDark ? "bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950" : "bg-gradient-to-b from-slate-50 via-white to-emerald-50"
+          isDark
+            ? "bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950"
+            : "bg-gradient-to-b from-slate-50 via-white to-emerald-50"
         }`}
       >
         <div className="container mx-auto px-4 md:px-6">
@@ -147,13 +213,17 @@ export default function NewsDetail() {
             className="inline-flex items-center mb-6 md:mb-8 text-emerald-600 hover:text-emerald-700 dark:text-emerald-300 text-xs md:text-sm font-semibold"
           >
             <ArrowLeft size={16} className="mr-1" />
-            Rudi kwenye Habari
+            {backToNewsText}
           </Link>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 md:gap-8">
             {/* Main */}
             <article className="lg:col-span-3">
-              <div className={`rounded-2xl border shadow-sm p-5 md:p-7 ${isDark ? "bg-gray-900/85 border-gray-800" : "bg-white/95 border-gray-100"}`}>
+              <div
+                className={`rounded-2xl border shadow-sm p-5 md:p-7 ${
+                  isDark ? "bg-gray-900/85 border-gray-800" : "bg-white/95 border-gray-100"
+                }`}
+              >
                 {/* Header */}
                 <header className="mb-6 md:mb-8">
                   <div className="flex items-center flex-wrap gap-3 mb-4">
@@ -167,7 +237,11 @@ export default function NewsDetail() {
                     ) : null}
                   </div>
 
-                  <h1 className={`text-xl md:text-3xl lg:text-4xl font-extrabold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}>
+                  <h1
+                    className={`text-xl md:text-3xl lg:text-4xl font-extrabold mb-4 ${
+                      isDark ? "text-white" : "text-gray-900"
+                    }`}
+                  >
                     {post.title}
                   </h1>
 
@@ -177,21 +251,23 @@ export default function NewsDetail() {
                         <User size={16} className="mr-1" />
                         {post.author_name}
                       </span>
+
                       {readTime ? (
                         <span className="flex items-center">
                           <Clock size={16} className="mr-1" />
-                          {readTime} min kusoma
+                          {readTime} {readTimeText}
                         </span>
                       ) : null}
+
                       <span className="flex items-center">
                         <Eye size={16} className="mr-1" />
-                        {Number(post.views || 0)} mara
+                        {Number(post.views || 0)} {viewsSuffix}
                       </span>
                     </div>
 
-                    {/* Share (optional) */}
+                    {/* Share */}
                     <div className={`text-[11px] ${isDark ? "text-gray-400" : "text-gray-500"}`}>
-                      Shiriki:{" "}
+                      {shareLabel}{" "}
                       <a
                         href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
                         target="_blank"
@@ -202,7 +278,9 @@ export default function NewsDetail() {
                       </a>
                       {" · "}
                       <a
-                        href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`}
+                        href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(
+                          shareText
+                        )}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-sky-500 hover:underline"
@@ -212,7 +290,7 @@ export default function NewsDetail() {
                     </div>
                   </div>
 
-                  <SmartImage src={post.featured_image} alt={post.title} isDark={isDark} />
+                  <SmartImage src={post.featured_image} alt={post.title} isDark={isDark} noImageText={noImageText} />
                 </header>
 
                 {/* Content */}
@@ -227,9 +305,13 @@ export default function NewsDetail() {
             <aside className="lg:col-span-1 space-y-6">
               {/* Related */}
               {related.length > 0 ? (
-                <div className={`rounded-2xl border p-5 md:p-6 ${isDark ? "bg-gray-900/85 border-gray-800" : "bg-white/95 border-gray-100"}`}>
+                <div
+                  className={`rounded-2xl border p-5 md:p-6 ${
+                    isDark ? "bg-gray-900/85 border-gray-800" : "bg-white/95 border-gray-100"
+                  }`}
+                >
                   <h3 className={`text-sm md:text-base font-bold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}>
-                    Makala Zinazohusiana
+                    {relatedTitle}
                   </h3>
 
                   <div className="space-y-4">
@@ -241,19 +323,30 @@ export default function NewsDetail() {
                               src={rp.featured_image}
                               alt={rp.title}
                               isDark={isDark}
+                              noImageText={noImageText}
                               heightClass="h-16"
                               roundedClass="rounded-xl"
                             />
                           </div>
+
                           <div className="flex-1">
-                            <h4 className={`text-xs md:text-sm font-semibold group-hover:text-emerald-600 transition-colors ${isDark ? "text-white" : "text-gray-900"}`}>
+                            <h4
+                              className={`text-xs md:text-sm font-semibold group-hover:text-emerald-600 transition-colors ${
+                                isDark ? "text-white" : "text-gray-900"
+                              }`}
+                            >
                               {rp.title}
                             </h4>
+
                             <div className="flex items-center gap-2 mt-1 text-[11px]">
                               <span className="bg-slate-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">
-                                {rp.category?.name || "Bila Kundi"}
+                                {rp.category?.name || t("newsNoCategory")}
                               </span>
-                              {rp.read_time ? <span className={isDark ? "text-gray-400" : "text-gray-600"}>{rp.read_time} min</span> : null}
+                              {rp.read_time ? (
+                                <span className={isDark ? "text-gray-400" : "text-gray-600"}>
+                                  {rp.read_time} {t("newsReadTimeSuffix")}
+                                </span>
+                              ) : null}
                             </div>
                           </div>
                         </div>
@@ -263,32 +356,38 @@ export default function NewsDetail() {
                 </div>
               ) : null}
 
-              {/* Meta card */}
-              <div className={`rounded-2xl border p-5 md:p-6 ${isDark ? "bg-gray-900/85 border-gray-800" : "bg-white/95 border-gray-100"}`}>
+              {/* Summary */}
+              <div
+                className={`rounded-2xl border p-5 md:p-6 ${
+                  isDark ? "bg-gray-900/85 border-gray-800" : "bg-white/95 border-gray-100"
+                }`}
+              >
                 <h3 className={`text-sm md:text-base font-bold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}>
-                  Muhtasari
+                  {summaryTitle}
                 </h3>
 
                 <div className="space-y-3 text-[12px] md:text-xs">
                   <div className="flex items-center justify-between gap-3">
-                    <span className={isDark ? "text-gray-300" : "text-gray-600"}>Kundi</span>
+                    <span className={isDark ? "text-gray-300" : "text-gray-600"}>{labelCategory}</span>
                     <span className={isDark ? "text-gray-100" : "text-gray-900"}>{safeCategoryName}</span>
                   </div>
 
                   <div className="flex items-center justify-between gap-3">
-                    <span className={isDark ? "text-gray-300" : "text-gray-600"}>Mwandishi</span>
+                    <span className={isDark ? "text-gray-300" : "text-gray-600"}>{labelAuthor}</span>
                     <span className={isDark ? "text-gray-100" : "text-gray-900"}>{post.author_name}</span>
                   </div>
 
                   {post.published_at ? (
                     <div className="flex items-center justify-between gap-3">
-                      <span className={isDark ? "text-gray-300" : "text-gray-600"}>Tarehe</span>
-                      <span className={isDark ? "text-gray-100" : "text-gray-900"}>{formatDate(post.published_at)}</span>
+                      <span className={isDark ? "text-gray-300" : "text-gray-600"}>{labelDate}</span>
+                      <span className={isDark ? "text-gray-100" : "text-gray-900"}>
+                        {formatDate(post.published_at)}
+                      </span>
                     </div>
                   ) : null}
 
                   <div className="flex items-center justify-between gap-3">
-                    <span className={isDark ? "text-gray-300" : "text-gray-600"}>Views</span>
+                    <span className={isDark ? "text-gray-300" : "text-gray-600"}>{labelViews}</span>
                     <span className={isDark ? "text-gray-100" : "text-gray-900"}>{Number(post.views || 0)}</span>
                   </div>
                 </div>
