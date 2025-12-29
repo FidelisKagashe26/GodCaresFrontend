@@ -3,15 +3,15 @@ import logo from "../assets/1000472563.png";
 
 export default function LoadingSpinner({ size = "md" }) {
   const ringSize = {
-    sm: "w-12 h-12",
-    md: "w-16 h-16",
-    lg: "w-20 h-20",
+    sm: "w-16 h-16",
+    md: "w-20 h-20",
+    lg: "w-32 h-32",
   };
 
   const logoSize = {
     sm: "w-10 h-10",
-    md: "w-12 h-12",
-    lg: "w-16 h-16",
+    md: "w-20 h-20",
+    lg: "w-32 h-32",
   };
 
   return (

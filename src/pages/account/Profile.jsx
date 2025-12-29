@@ -298,11 +298,11 @@ export default function Profile() {
                   </h2>
 
                   <ul className="space-y-1 text-gray-600 dark:text-gray-300 text-xs">
-                    {me?.id && (
+                    {/* {me?.id && (
                       <li>
                         <span className="font-medium">ID:</span> {me.id}
                       </li>
-                    )}
+                    )} */}
                     <li>
                       <span className="font-medium">{language === "sw" ? "Username:" : "Username:"}</span> {me?.username || "-"}
                     </li>

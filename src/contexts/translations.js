@@ -82,7 +82,112 @@ export const translations = {
     newPassword: 'Nenosiri jipya',
     savePassword: 'Hifadhi neno la siri',
     changePasswordHint: 'Tumia mchanganyiko wa herufi, namba na alama.',
-    changePasswordFailed: 'Imeshindikana kubadili nenosiri.'
+    changePasswordFailed: 'Imeshindikana kubadili nenosiri.',
+
+    // Ongeza hizi ndani ya sw: { ... }
+    homeSeoTitle: 'Nyumbani',
+    homeSeoDesc:
+      'Karibu GOD CARES 365 - Safari ya kidigitali ya kujifunza Biblia, kuomba, na kuishi ujumbe wa milele kila siku.',
+    homeSeoKeywords:
+      'kiroho, biblia, maombi, imani, tanzania, masomo, habari, mission, malaika watatu',
+
+    homeHeroSlide1Title: 'Karibu GOD CARES 365',
+    homeHeroSlide1Subtitle:
+      'Kutoka kutomjua Mungu kabisa, hadi kuwa mshuhudia wa Ujumbe wa Malaika Watatu – safari yako inaanza hapa.',
+    homeHeroSlide1Badge: 'Gundua • Elewa • Utume',
+    homeHeroSlide1CtaContinue: 'Endelea na Mafunzo',
+    homeHeroSlide1CtaStart: 'Anza Safari ya Imani',
+
+    homeHeroSlide2Title: 'Omba Nasi Kila Siku',
+    homeHeroSlide2Subtitle:
+      'Tuma maombi yako, pata watu wa kukuombea, na uone mkono wa Mungu ukifanya kazi 365.',
+    homeHeroSlide2Badge: 'Maombi • Faraja • Tumaini',
+    homeHeroSlide2Cta: 'Tuma Ombi la Maombi',
+
+    homeHeroSlide3Title: 'Jiunge na Harakati za Kimataifa',
+    homeHeroSlide3Subtitle:
+      'Hudhuria semina, ibada na matukio ya kimataifa ya God Cares 365 – mtandaoni na ana kwa ana.',
+    homeHeroSlide3Badge: 'Matukio • Ushirika • Utume',
+    homeHeroSlide3Cta: 'Angalia Matukio',
+
+    homeJourneyPill: 'Safari ya Imani • Mtafutaji → Mwanazuoni → Mmishenari',
+    homeJourneyTitle: 'Kutoka Kugundua Kweli hadi Kuishi Ujumbe',
+    homeJourneyDesc:
+      'God Cares 365 inakusaidia kusonga hatua kwa hatua: kwanza kugundua Neno, kisha kuelewa unabii, na mwishowe kuishi kama mmishenari wa kila siku.',
+
+    homeStage1Label: 'Hatua 1',
+    homeStage1Title: 'Mtafutaji – Gundua Kweli',
+    homeStage1Desc:
+      'Masomo ya msingi ya Biblia: upendo wa Mungu, wokovu, ubatizo, afya na tumaini la kurudi kwa Yesu.',
+    homeStage1Hint: 'Wengi huanzia hapa kabla ya kuingia kwenye unabii wa kina.',
+    homeStage1Cta: 'Anza na masomo ya msingi',
+
+    homeStage2Label: 'Hatua 2',
+    homeStage2Title: 'Mwanazuoni – Elewa Unabii',
+    homeStage2Desc:
+      'Mafunzo ya Danieli & Ufunuo, Sabato ya kweli, Patakatifu na mpango wa hukumu ya Mungu.',
+    homeStage2Hint: 'Wanafunzi waliokomaa hapa wako tayari kwa utume wa kushirikisha kweli.',
+    homeStage2Cta: 'Tazama masomo ya unabii',
+
+    homeStage3Label: 'Hatua 3',
+    homeStage3Title: 'Mmishenari – Ishi & Shiriki',
+    homeStage3Desc:
+      'Kuongoza vikundi vya Biblia, kushuhudia, na kufikia watu ana kwa ana na mtandaoni.',
+    homeStage3Hint: 'Hapa God Cares 365 inageuka kuwa harakati hai ya kimissioni.',
+    homeStage3CtaAuthed: 'Fungua dashibodi ya utume',
+    homeStage3CtaGuest: 'Ingia uanze utume',
+
+    homeChooseHubTitle: 'Chagua Kituo cha Safari Yako',
+    homeChooseHubMeta: 'Masomo • Maombi • Habari • Matukio • Media • Michango',
+
+    homeFeatureStudiesTitle: 'Masomo ya Biblia',
+    homeFeatureStudiesTag: 'Msingi & Unabii',
+    homeFeatureStudiesDesc:
+      'Masomo yaliyopangwa kwa misimu: misingi ya imani, Danieli & Ufunuo, na maisha ya ushuhuda.',
+    homeFeatureStudiesCta: 'Fungua masomo',
+
+    homeFeaturePrayerTitle: 'Maombi',
+    homeFeaturePrayerTag: 'Maombi & Msaada',
+    homeFeaturePrayerDesc:
+      'Tuma maombi binafsi, ya familia au huduma – na tuombe pamoja kama mwili wa Kristo.',
+    homeFeaturePrayerCta: 'Omba nasi',
+
+    homeFeatureNewsTitle: 'Habari & Vipengele',
+    homeFeatureNewsTag: 'Hadithi & Ushuhuda',
+    homeFeatureNewsDesc:
+      'Makala za kiroho, ushuhuda wa watumishi na taarifa za harakati za God Cares 365.',
+    homeFeatureNewsCta: 'Soma habari',
+
+    homeFeatureEventsTitle: 'Matukio Maalum',
+    homeFeatureEventsTag: 'Semina & Mikutano',
+    homeFeatureEventsDesc:
+      'Semina, kambi za injili, warsha na ibada za kipekee – mtandaoni na ana kwa ana.',
+    homeFeatureEventsCta: 'Angalia matukio',
+
+    homeFeatureMediaTitle: 'Maktaba ya Media',
+    homeFeatureMediaTag: 'Video • Sauti • Rasilimali',
+    homeFeatureMediaDesc:
+      'Tazama mahubiri, vipindi, nyimbo na rasilimali za media popote ulipo.',
+    homeFeatureMediaCta: 'Fungua maktaba',
+
+    homeFeatureGivingTitle: 'Michango',
+    homeFeatureGivingTag: 'Saidia Utume',
+    homeFeatureGivingDesc:
+      'Changia kazi ya Mungu, media, mission za vijana na vikundi vya Biblia duniani kote.',
+    homeFeatureGivingCta: 'Changia sasa',
+
+    homeQuoteKicker: 'God Cares 365 • Upendo usiolala',
+    homeQuoteText:
+      '"Hili ndilo pendo, si kwamba sisi tulimpenda Mungu, bali kwamba yeye alitupenda sisi, akamtuma Mwanawe kuwa kipatanisho kwa dhambi zetu."',
+    homeQuoteCite: '– 1 Yohana 4:10',
+
+    homeNewsletterTitle: 'Jiunge na Jarida la Maombi & Mafunzo',
+    homeNewsletterDesc:
+      'Pata ujumbe wa kila wiki, maombi maalum, vifungu vya Biblia na rasilimali mpya moja kwa moja kwenye barua pepe yako.',
+    homeNewsletterEmailPlaceholder: 'Barua pepe yako',
+    homeNewsletterBtn: 'Jiunge',
+    homeNewsletterNote: 'Hatutakutumia spam. Unaweza kujitoa wakati wowote.',
+
   },
 
   en: {
@@ -167,6 +272,111 @@ export const translations = {
     newPassword: 'New password',
     savePassword: 'Save password',
     changePasswordHint: 'Use a mix of letters, numbers and symbols.',
-    changePasswordFailed: 'Failed to change password.'
+    changePasswordFailed: 'Failed to change password.',
+
+    // Ongeza hizi ndani ya en: { ... }
+    homeSeoTitle: 'Home',
+    homeSeoDesc:
+      'Welcome to GOD CARES 365 - A digital journey to learn the Bible, pray, and live the everlasting message every day.',
+    homeSeoKeywords:
+      'spiritual, bible, prayer, faith, tanzania, lessons, news, mission, three angels',
+
+    homeHeroSlide1Title: 'Welcome to GOD CARES 365',
+    homeHeroSlide1Subtitle:
+      'From not knowing God at all to becoming a witness of the Three Angels’ Message—your journey starts here.',
+    homeHeroSlide1Badge: 'Discover • Understand • Mission',
+    homeHeroSlide1CtaContinue: 'Continue Learning',
+    homeHeroSlide1CtaStart: 'Start Your Faith Journey',
+
+    homeHeroSlide2Title: 'Pray With Us Every Day',
+    homeHeroSlide2Subtitle:
+      'Submit your prayer requests, find people to pray with you, and see God’s hand at work—365 days.',
+    homeHeroSlide2Badge: 'Prayer • Comfort • Hope',
+    homeHeroSlide2Cta: 'Submit a Prayer Request',
+
+    homeHeroSlide3Title: 'Join the Global Movement',
+    homeHeroSlide3Subtitle:
+      'Attend seminars, worship services, and global God Cares 365 events—online and in person.',
+    homeHeroSlide3Badge: 'Events • Fellowship • Mission',
+    homeHeroSlide3Cta: 'View Events',
+
+    homeJourneyPill: 'Faith Journey • Seeker → Scholar → Missionary',
+    homeJourneyTitle: 'From Discovering Truth to Living the Message',
+    homeJourneyDesc:
+      'God Cares 365 helps you grow step by step: first discover the Word, then understand prophecy, and finally live as an everyday missionary.',
+
+    homeStage1Label: 'Stage 1',
+    homeStage1Title: 'The Seeker – Discover Truth',
+    homeStage1Desc:
+      'Foundational Bible lessons: God’s love, salvation, baptism, health, and the hope of Jesus’ return.',
+    homeStage1Hint: 'Many start here before going deeper into prophecy.',
+    homeStage1Cta: 'Start with foundational lessons',
+
+    homeStage2Label: 'Stage 2',
+    homeStage2Title: 'The Scholar – Understand Prophecy',
+    homeStage2Desc:
+      'Studies in Daniel & Revelation, the true Sabbath, the Sanctuary, and God’s judgment message.',
+    homeStage2Hint: 'Mature learners here are ready to share truth through mission.',
+    homeStage2Cta: 'Explore prophecy lessons',
+
+    homeStage3Label: 'Stage 3',
+    homeStage3Title: 'The Missionary – Live & Share',
+    homeStage3Desc:
+      'Lead Bible groups, witness, and reach people both in person and online.',
+    homeStage3Hint: 'Here, God Cares 365 becomes a living missionary movement.',
+    homeStage3CtaAuthed: 'Open the mission dashboard',
+    homeStage3CtaGuest: 'Login to start mission',
+
+    homeChooseHubTitle: 'Choose Your Journey Hub',
+    homeChooseHubMeta: 'Lessons • Prayer • News • Events • Media • Giving',
+
+    homeFeatureStudiesTitle: 'Bible Studies',
+    homeFeatureStudiesTag: 'Discovery & Prophecy',
+    homeFeatureStudiesDesc:
+      'Structured lessons by seasons: faith foundations, Daniel & Revelation, and a life of witnessing.',
+    homeFeatureStudiesCta: 'Open lessons',
+
+    homeFeaturePrayerTitle: 'Prayer',
+    homeFeaturePrayerTag: 'Prayer & Support',
+    homeFeaturePrayerDesc:
+      'Send personal, family, or ministry prayer requests—and pray together as the body of Christ.',
+    homeFeaturePrayerCta: 'Pray with us',
+
+    homeFeatureNewsTitle: 'News & Features',
+    homeFeatureNewsTag: 'Stories & Testimonies',
+    homeFeatureNewsDesc:
+      'Spiritual articles, worker testimonies, and updates from the God Cares 365 movement.',
+    homeFeatureNewsCta: 'Read news',
+
+    homeFeatureEventsTitle: 'Special Events',
+    homeFeatureEventsTag: 'Seminars & Gatherings',
+    homeFeatureEventsDesc:
+      'Seminars, evangelistic camps, workshops, and special worship services—online and in person.',
+    homeFeatureEventsCta: 'View events',
+
+    homeFeatureMediaTitle: 'Media Library',
+    homeFeatureMediaTag: 'Video • Audio • Resources',
+    homeFeatureMediaDesc:
+      'Watch sermons, programs, songs, and media resources wherever you are.',
+    homeFeatureMediaCta: 'Open library',
+
+    homeFeatureGivingTitle: 'Giving',
+    homeFeatureGivingTag: 'Support the Mission',
+    homeFeatureGivingDesc:
+      'Support God’s work, media, youth mission initiatives, and Bible groups worldwide.',
+    homeFeatureGivingCta: 'Give now',
+
+    homeQuoteKicker: 'God Cares 365 • Love that never sleeps',
+    homeQuoteText:
+      '"This is love: not that we loved God, but that He loved us and sent His Son to be the sacrifice for our sins."',
+    homeQuoteCite: '– 1 John 4:10',
+
+    homeNewsletterTitle: 'Join the Prayer & Study Newsletter',
+    homeNewsletterDesc:
+      'Get a weekly message, special prayers, Bible passages, and new resources delivered to your email.',
+    homeNewsletterEmailPlaceholder: 'Your email',
+    homeNewsletterBtn: 'Subscribe',
+    homeNewsletterNote: 'No spam. You can unsubscribe anytime.',
+
   }
 };
